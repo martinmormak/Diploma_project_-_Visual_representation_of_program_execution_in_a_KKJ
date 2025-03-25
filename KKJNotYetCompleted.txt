@@ -1,0 +1,735 @@
+// -------------------------------------------------------------------------
+// KKJ.txt
+// SLANG version of the *denotational* semantics of a simple imperative language
+// (c) 2023 https://www.risc.jku.at/research/formal/software/SLANG
+// Martin Mormák <martin.mormak@student.tuke.sk>
+// -------------------------------------------------------------------------
+
+language KKJ
+{
+  target java
+  {
+    header
+    {#
+      package lang.kkj;
+      import java.util.*;
+      import static lang.kkj.KKJ.*;
+    #}
+  }
+
+  // ----------------------------------------------------------------------
+  // syntactic domains
+  // ----------------------------------------------------------------------
+  domains
+  {
+    NumberConstant = Num[NUM];
+    BooleanConstant = True + False;
+    Constant = NumConstant[NumberConstant] + BoolConstant[BooleanConstant] + NumPopInside[NumberConstant,Constant] + BoolPopInside[BooleanConstant,Constant];
+    NumberExpression = NumExpression[NumberConstant] + Add[NumberExpression,NumberExpression] + Sub[NumberExpression,NumberExpression] + Mul[NumberExpression,NumberExpression] + Cmp[NumberExpression,NumberExpression] + NumberPopBefore[NumberExpression,Constant] + NumberPopAfter[Constant,NumberExpression] + NumberPopInside1[Constant,NumberExpression] + NumberPopInside2[Constant,NumberExpression];
+    BooleanExpression = BoolExpression[BooleanConstant] + Not[BooleanExpression] + And[BooleanExpression,BooleanExpression] + IsNeg[NumberExpression] + IsPos[NumberExpression] + BooleanPopBefore[BooleanExpression,Constant] + BooleanPopAfter[Constant,BooleanExpression] + BooleanPopInside1[Constant,BooleanExpression] + BooleanPopInside2[Constant,BooleanExpression];
+    Command = Exp[NumberExpression] + BoolExp[BooleanExpression] + Pop[Constant];
+    Sequence = Single[Command] + Seq[Command,Sequence];
+    Program = Prog[Sequence];
+  }
+
+  // -----------------------------------------------------------------------
+  // printer
+  // -----------------------------------------------------------------------
+  printer
+  {
+    domain NumberConstant
+    {
+      case Num[n] → # _result = n; #;
+    }
+    domain BooleanConstant
+    {
+      case True → # _result = "true"; #;
+      case False → # _result = "false"; #;
+    }
+    domain Constant
+    {
+      case NumConstant[n] → # _result = n.toString(); #;
+      case BoolConstant[b] → # _result = b.toString(); #;
+      case NumPopInside[n,c] → # _result = " X" + n + "X " + c; #;
+      case BoolPopInside[b,c] → # _result = " X" + b + "X " + c; #;
+    }
+    domain NumberExpression
+    {
+      case NumExpression[n] → # _result = n.toString(); #;
+      case Add[e1,e2] → # _result = "(" + e1 + " + " + e2 + ")"; #;
+      case Sub[e1,e2] → # _result = "(" + e1 + " - " + e2 + ")"; #;
+      case Mul[e1,e2] → # _result = "(" + e1 + " * " + e2 + ")"; #;
+      case Cmp[e1,e2] → # _result = "(" + e1 + " == " + e2 + ")"; #;
+      case NumberPopBefore[e,c] → # _result = e + " X" + c + "X "; #;
+      case NumberPopAfter[c,e] → # _result = " X" + c + "X " + e; #;
+      case NumberPopInside1[c,e] → # _result = " X" + c + "X " + e; #;
+      case NumberPopInside2[c,e] → # _result = " X" + c + "X " + " X" + e + "X "; #;
+    }
+    domain BooleanExpression
+    {
+      case BoolExpression[bc] → # _result = bc.toString(); #;
+      case Not[b] → # _result = "(~" + b + ")"; #;
+      case And[b1,b2] → # _result = "(" + b1 + " && " + b2 + ")"; #;
+      case IsNeg[e] → # _result = "(" + e + " < 0 )"; #;
+      case IsPos[e] → # _result = "(" + e + " > 0 )"; #;
+      case BooleanPopBefore[b,c] → # _result = b + " X" + c + "X "; #;
+      case BooleanPopAfter[c,b] → # _result = " X" + c + "X " + b; #;
+      case BooleanPopInside1[c,b] → # _result = " X" + c + "X " + b; #;
+      case BooleanPopInside2[c,b] → # _result = " X" + c + "X " + " X" + b + "X "; #;
+    }
+    domain Command
+    {
+      case Exp[e] → # _result = e.toString(); #;
+      case BoolExp[b] → # _result = b.toString(); #;
+      case Pop[c] → # _result = " X" + c + "X "; #;
+    }
+    domain Sequence
+    {
+      case Single[c] → # _result = "{" + c + "}"; #;
+      case Seq[c1,c2] → # _result = "{" + c1 + "}" + ", " + c2; #;
+    }
+    domain Program
+    {
+      case Prog[c] → # _result = c.toString(); #;
+    }
+  }
+  
+  // -----------------------------------------------------------------------
+  // parser
+  // -----------------------------------------------------------------------
+  parser antlr4
+  {
+    domain NumberConstant
+    {
+      case # n=dNUM # → Num[n];
+    }
+    domain BooleanConstant
+    {
+      case # 'true' # → True;
+      case # 'false' # → False;
+    }
+    domain Constant
+    {
+      case # n=dNumberConstant # → NumConstant[n];
+      case # b=dBooleanConstant # → BoolConstant[b];
+      case # n=dNumberConstant ' ' c=dConstant ' POP' # → NumPopInside[n,c];
+      case # b=dBooleanConstant ' ' c=dConstant ' POP' # → BoolPopInside[b,c];
+    }
+    domain NumberExpression
+    {
+      case # n=dNumberConstant # → NumExpression[n];
+      case # e1=dNumberExpression ' ' e2=dNumberExpression ' MUL' # → Mul[e1,e2];
+      case # e1=dNumberExpression ' ' e2=dNumberExpression ' ADD' # → Add[e1,e2];
+      case # e1=dNumberExpression ' ' e2=dNumberExpression ' SUB' # → Sub[e1,e2];
+      case # e1=dNumberExpression ' ' e2=dNumberExpression ' CMP' # → Cmp[e1,e2];
+      case # e=dNumberExpression ' ' c=dConstant ' POP' # → NumberPopBefore[e,c];
+      case # c=dConstant ' POP' ' ' e=dNumberExpression # → NumberPopAfter[c,e];
+      case # c=dConstant ' ' e=dNumberExpression ' POP' # → NumberPopInside1[c,e];
+      case # c=dConstant ' ' e=dNumberExpression ' POP POP' # → NumberPopInside2[c,e];
+    }
+    domain BooleanExpression
+    {
+      case # bc=dBooleanConstant # → BoolExpression[bc];
+      case # b=dBooleanExpression ' NOT'# → Not[b];
+      case # b1=dBooleanExpression ' ' b2=dBooleanExpression ' AND' # → And[b1,b2];
+      case # e=dNumberExpression ' ISNEG'# → IsNeg[e];
+      case # e=dNumberExpression ' ISPOS'# → IsPos[e];
+      case # b=dBooleanExpression ' ' c=dConstant ' POP' # → BooleanPopBefore[b,c];
+      case # c=dConstant ' POP' ' ' b=dBooleanExpression # → BooleanPopAfter[c,b];
+      case # c=dConstant ' ' b=dBooleanExpression ' POP' # → BooleanPopInside1[c,b];
+      case # c=dConstant ' ' b=dBooleanExpression ' POP POP' # → BooleanPopInside2[c,b];
+    }
+    domain Command
+    {
+      case # e=dNumberExpression # → Exp[e];
+      case # b=dBooleanExpression # → BoolExp[b];
+      case # c=dConstant ' POP' # → Pop[c];
+    }
+    domain Sequence
+    {
+      case # c=dCommand # → Single[c];
+      case # c1=dCommand ' ' c2=dSequence # → Seq[c1,c2];
+    }
+    domain Program
+    {
+      case # c=dSequence EOF # → Prog[c];
+    }
+  }
+  
+  // -----------------------------------------------------------------------
+  // type system
+  // -----------------------------------------------------------------------
+  code
+  {#
+    public enum Type { Int }
+    public static class Env
+    {
+      private HashMap<String,Value> variables = new HashMap<>();
+      private List<Stack<Value>> stacks = new LinkedList<>();
+      public Env()
+      { super(); stacks.add(new Stack<>()); }
+      public void put(String key, Value value)
+      { variables.put(key.toString(), value); }
+      public Value get(String key)
+      { return variables.get(key.toString()); }
+      public String printVariables()
+      { return variables.toString(); }
+      public void push(Value value)
+      { stacks.getLast().push(value); }
+      public Value peek()
+      { if (!stacks.getLast().isEmpty()) { return stacks.getLast().peek(); } else { throw new IllegalStateException("Cannot peek from an empty stack."); } }
+      public Value pop()
+      { if (!stacks.getLast().isEmpty()) { return stacks.getLast().pop(); } else { throw new IllegalStateException("Cannot pop from an empty stack."); } }
+      public String printStack()
+      { return stacks.getLast().toString(); }
+      public  String printStackHistory()
+      { return stacks.toString(); }
+      public void newStack()
+      { stacks.add(new Stack<>()); }
+    }
+    public static class TypeError extends RuntimeException
+    { public TypeError(String msg) { super(msg); } }
+    public static void check(Boolean b, String msg)
+    { if (!b) throw new TypeError(msg); }
+    sealed interface Value permits IntegerValue, StringValue, BoolValue { Object getValue(); }
+    record IntegerValue(Integer value) implements Value
+    { @Override public Integer getValue() { return value; } @Override public String toString() { return String.valueOf(value); } }
+    record StringValue(String value) implements Value
+    { @Override public String getValue() { return value; } @Override public String toString() { return value; } }
+    record BoolValue(Boolean value) implements Value
+    { @Override public Boolean getValue() { return value; } @Override public String toString() { return String.valueOf(value); } }
+  #}
+  judgment #Env# ⊢ NumberConstant: nconstatant
+  {
+    inference te ⊢ Num[n]: nconstatant
+    {
+    }
+  }
+  judgment #Env# ⊢ BooleanConstant: bconstatant
+  {
+    inference te ⊢ True: bconstatant
+    {
+    }
+    inference te ⊢ False: bconstatant
+    {
+    }
+  }
+  judgment #Env# ⊢ Constant: constatant
+  {
+    inference te ⊢ NumConstant[n]: constatant
+    {
+      te ⊢ n: nconstatant;
+    }
+    inference te ⊢ BoolConstant[b]: constatant
+    {
+      te ⊢ b: bconstatant;
+    }
+    inference te ⊢ NumPopInside[n,c]: constatant
+    {
+      te ⊢ n: nconstatant;
+      te ⊢ c: constatant;
+    }
+    inference te ⊢ BoolPopInside[b,c]: constatant
+    {
+      te ⊢ b: bconstatant;
+      te ⊢ c: constatant;
+    }
+  }
+  judgment #Env# ⊢ NumberExpression: nexpression
+  {
+    inference te ⊢ NumExpression[n]: nexpression
+    {
+      te ⊢ n: nconstatant;
+    }
+    inference te ⊢ Add[e1,e2]: nexpression
+    {
+      te ⊢ e1: nexpression;
+      te ⊢ e2: nexpression;
+    }
+    inference te ⊢ Sub[e1,e2]: nexpression
+    {
+      te ⊢ e1: nexpression;
+      te ⊢ e2: nexpression;
+    }
+    inference te ⊢ Mul[e1,e2]: nexpression
+    {
+      te ⊢ e1: nexpression;
+      te ⊢ e2: nexpression;
+    }
+    inference te ⊢ Cmp[e1,e2]: nexpression
+    {
+      te ⊢ e1: nexpression;
+      te ⊢ e2: nexpression;
+    }
+    inference te ⊢ NumberPopBefore[e,c]: nexpression
+    {
+      te ⊢ e: nexpression;
+      te ⊢ c: constatant;
+    }
+    inference te ⊢ NumberPopAfter[c,e]: nexpression
+    {
+      te ⊢ c: constatant;
+      te ⊢ e: nexpression;
+    }
+    inference te ⊢ NumberPopInside1[c,e]: nexpression
+    {
+      te ⊢ c: constatant;
+      te ⊢ e: nexpression;
+    }
+    inference te ⊢ NumberPopInside2[c,e]: nexpression
+    {
+      te ⊢ c: constatant;
+      te ⊢ e: nexpression;
+    }
+  }
+  judgment #Env# ⊢ BooleanExpression: bexpression
+  {
+    inference te ⊢ BoolExpression[bc]: bexpression
+    {
+      te ⊢ bc: bconstatant;
+    }
+    inference te ⊢ Not[b]: bexpression
+    {
+      te ⊢ b: bexpression;
+    }
+    inference te ⊢ And[b1,b2]: bexpression
+    {
+      te ⊢ b1: bexpression;
+      te ⊢ b2: bexpression;
+    }
+    inference te ⊢ IsNeg[e]: bexpression
+    {
+      te ⊢ e: nexpression;
+    }
+    inference te ⊢ IsPos[e]: bexpression
+    {
+      te ⊢ e: nexpression;
+    }
+    inference te ⊢ BooleanPopBefore[b,c]: bexpression
+    {
+      te ⊢ b: bexpression;
+      te ⊢ c: constatant;
+    }
+    inference te ⊢ BooleanPopAfter[c,b]: bexpression
+    {
+      te ⊢ c: constatant;
+      te ⊢ b: bexpression;
+    }
+    inference te ⊢ BooleanPopInside1[c,b]: bexpression
+    {
+      te ⊢ c: constatant;
+      te ⊢ b: bexpression;
+    }
+    inference te ⊢ BooleanPopInside2[c,b]: bexpression
+    {
+      te ⊢ c: constatant;
+      te ⊢ b: bexpression;
+    }
+  }
+  judgment #Env# ⊢ Command: command
+  {
+    inference te ⊢ Exp[e]: command
+    {
+      te ⊢ e: nexpression;
+    }
+    inference te ⊢ BoolExp[b]: command
+    {
+      te ⊢ b: bexpression;
+    }
+    inference te ⊢ Pop[c]: command
+    {
+      te ⊢ c: constatant;
+    }
+  }
+  judgment #Env# ⊢ Sequence: sequence
+  {
+    inference te ⊢ Single[c]: sequence
+    {
+      te ⊢ c: command;
+    }
+    inference te ⊢ Seq[c1,c2]: sequence
+    {
+      te ⊢ c1: command;
+      te ⊢ c2: sequence;
+    }
+  }
+  judgment ⊢ Program: program
+  {
+    inference ⊢ Prog[c]: program
+    {
+      te: #Env# = #new Env()# ;
+      te ⊢ c: sequence;
+    }
+  }
+  
+  // -----------------------------------------------------------------------
+  // denotational semantics
+  // -----------------------------------------------------------------------
+  code
+  {#
+    public static class Failure extends RuntimeException { }
+    public static void check(Boolean b) { if (!b) throw new Failure(); }
+  #}
+  function 〚NumberConstant〛: #Env# → #Env#
+  {
+    equation 〚Num[n]〛(ve) = ve0
+    {
+      #
+        Value v = new IntegerValue(Integer.valueOf(n));
+        ve.push(v);
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Num"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); #}
+  }
+  function 〚BooleanConstant〛: #Env# → #Env#
+  {
+    equation 〚True〛(ve) = ve0
+    {
+      #
+        Value v = new BoolValue(true);
+        ve.push(v);
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("True"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚False〛(ve) = ve0
+    {
+      #
+        Value v = new BoolValue(false);
+        ve.push(v);
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("False"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+  }
+  function 〚Constant〛: #Env# → #Env#
+  {
+    equation 〚NumConstant[n]〛(ve) = ve0
+    {
+      ve0 = 〚n〛(ve);
+    }
+    after  {# System.out.println("NumConstant"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚BoolConstant[b]〛(ve) = ve0
+    {
+      ve0 = 〚b〛(ve);
+    }
+    after  {# System.out.println("BoolConstant"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚NumPopInside[n,c]〛(ve) = ve0
+    {
+      var1 = 〚n〛(ve);
+      var2 = 〚c〛(ve);
+      #
+        Value v = ve.pop();
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("NumPopInside"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚BoolPopInside[b,c]〛(ve) = ve0
+    {
+      var1 = 〚b〛(ve);
+      var2 = 〚c〛(ve);
+      #
+        Value v = ve.pop();
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("BoolPopInside"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+  }
+  function 〚NumberExpression〛: #Env# → #Env#
+  {
+    equation 〚NumExpression[n]〛(ve) = ve0
+    {
+      ve0 = 〚n〛(ve);
+    }
+    after  {# System.out.println("NumExpresion"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚Add[e1,e2]〛(ve) = ve0
+    {
+      var1 =〚e1〛(ve);
+      var2 =〚e2〛(ve);
+      #
+        Value v1 = ve.pop();
+        Value v2 = ve.pop();
+        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
+          Value v = new IntegerValue(ev2.getValue() + ev1.getValue());
+          ve.push(v);
+        } else {
+          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
+        }
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Add"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); #}
+    equation 〚Sub[e1,e2]〛(ve) = ve0
+    {
+      var1 =〚e1〛(ve);
+      var2 =〚e2〛(ve);
+      #
+        Value v1 = ve.pop();
+        Value v2 = ve.pop();
+        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
+          Value v = new IntegerValue(ev2.getValue() - ev1.getValue());
+          ve.push(v);
+        } else {
+          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
+        }
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Sub"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); #}
+    equation 〚Mul[e1,e2]〛(ve) = ve0
+    {
+      var1 =〚e1〛(ve);
+      var2 =〚e2〛(ve);
+      #
+        Value v1 = ve.pop();
+        Value v2 = ve.pop();
+        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
+          Value v = new IntegerValue(ev2.getValue() * ev1.getValue());
+          ve.push(v);
+        } else {
+          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
+        }
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Mul"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); #}
+    equation 〚Cmp[e1,e2]〛(ve) = ve0
+    {
+      var1 =〚e1〛(ve);
+      var2 =〚e2〛(ve);
+      #
+        Value v1 = ve.pop();
+        Value v2 = ve.pop();
+        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
+          if(ev1.getValue() < ev2.getValue()){
+            Value lv = new IntegerValue(1);
+            ve.push(lv);
+          } else if(ev1.getValue() > ev2.getValue()){
+            Value mv = new IntegerValue(-1);
+            ve.push(mv);
+          } else {
+            Value mv = new IntegerValue(0);
+            ve.push(mv);
+          }
+        } else {
+          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
+        }
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Cmp"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); #}
+    equation 〚NumberPopBefore[e,c]〛(ve) = ve0
+    {
+      var1 = 〚e〛(ve);
+      var2 = 〚c〛(ve);
+      #
+        Value v = ve.pop();
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("NumberPopBefore"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚NumberPopAfter[c,e]〛(ve) = ve0
+    {
+      var1 = 〚c〛(ve);
+      #
+        Value v = ve.pop();
+      #
+      var2 = 〚e〛(ve);
+      ve0 = ve;
+    }
+    after  {# System.out.println("NumberPopAfter"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚NumberPopInside1[c,e]〛(ve) = ve0
+    {
+      var1 = 〚c〛(ve);
+      var2 = 〚e〛(ve);
+      #
+        Value v = ve.pop();
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("NumberPopInside1"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚NumberPopInside2[c,e]〛(ve) = ve0
+    {
+      var1 = 〚c〛(ve);
+      var2 = 〚e〛(ve);
+      #
+        Value v = ve.pop();
+        v = ve.pop();
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("NumberPopInside2"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+  }
+  function 〚BooleanExpression〛: #Env# → #Env#
+  {
+    equation 〚BoolExpression[bc]〛(ve) = ve0
+    {
+      ve0 = 〚bc〛(ve);
+    }
+    after  {# System.out.println("NumExpresion"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚Not[b]〛(ve) = ve0
+    {
+      var =〚b〛(ve);
+      #
+        Value v0 = ve.pop();
+        if (v0 instanceof BoolValue bv0) {
+          Value v = new BoolValue(!bv0.getValue());
+          ve.push(v);
+        } else {
+          throw new IllegalArgumentException("Both values must be BoolValue for logical operations.");
+        }
+      # 
+      ve0 = ve;
+    }
+    after  {# System.out.println("Not"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚And[b1,b2]〛(ve) = ve0
+    {
+      var1 =〚b1〛(ve);
+      var2 =〚b2〛(ve);
+      #
+        Value v1 = ve.pop();
+        Value v2 = ve.pop();
+        if (v1 instanceof BoolValue bv1 && v2 instanceof BoolValue bv2) {
+          Value v = new BoolValue(bv2.getValue() && bv1.getValue());
+          ve.push(v);
+        } else {
+          throw new IllegalArgumentException("Both values must be BoolValue for logical operations.");
+        }
+      # 
+      ve0 = ve;
+    }
+    after  {# System.out.println("And"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚IsNeg[e]〛(ve) = ve0
+    {
+      var =〚e〛(ve);
+      #
+        Value v = ve.pop();
+        if (v instanceof IntegerValue ev) {
+          if(ev.getValue() < 0){
+            Value vt = new BoolValue(true);
+            ve.push(vt);
+          } else {
+            Value vf = new BoolValue(false);
+            ve.push(vf);
+          }
+        } else {
+          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
+        }
+      # 
+      ve0 = ve;
+    }
+    after  {# System.out.println("IsNeg"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚IsPos[e]〛(ve) = ve0
+    {
+      var =〚e〛(ve);
+      #
+        Value v = ve.pop();
+        if (v instanceof IntegerValue ev) {
+          if(ev.getValue() > 0){
+            Value vt = new BoolValue(true);
+            ve.push(vt);
+          } else {
+            Value vf = new BoolValue(false);
+            ve.push(vf);
+          }
+        } else {
+          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
+        }
+      # 
+      ve0 = ve;
+    }
+    after  {# System.out.println("IsPos"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚BooleanPopBefore[b,c]〛(ve) = ve0
+    {
+      var1 = 〚b〛(ve);
+      var2 = 〚c〛(ve);
+      #
+        Value v = ve.pop();
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("BooleanPopBefore"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚BooleanPopAfter[c,b]〛(ve) = ve0
+    {
+      var1 = 〚c〛(ve);
+      #
+        Value v = ve.pop();
+      #
+      var2 = 〚b〛(ve);
+      ve0 = ve;
+    }
+    after  {# System.out.println("BooleanPopAfter"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚BooleanPopInside1[c,b]〛(ve) = ve0
+    {
+      var1 = 〚c〛(ve);
+      var2 = 〚b〛(ve);
+      #
+        Value v = ve.pop();
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("BooleanPopInside1"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚BooleanPopInside2[c,b]〛(ve) = ve0
+    {
+      var1 = 〚c〛(ve);
+      var2 = 〚b〛(ve);
+      #
+        Value v = ve.pop();
+        v = ve.pop();
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("BooleanPopInside2"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+  }
+  function 〚Command〛: #Env# → #Env#
+  {
+    equation 〚Exp[e]〛(ve) = ve0
+    {
+      v = 〚e〛(ve);
+      ve0 = ve;
+    }
+    after  {# System.out.println("Exp"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚BoolExp[b]〛(ve) = ve0
+    {
+      v = 〚b〛(ve);
+      ve0 = ve;
+    }
+    after  {# System.out.println("BoolExp"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚Pop[c]〛(ve) = ve0
+    {
+      var = 〚c〛(ve);
+      #
+        Value v = ve.pop();
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Pop"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+  }
+  function 〚Sequence〛: #Env# → #Env#
+  {
+    equation 〚Single[c]〛(ve) = ve0
+    {
+      ve0 = 〚c〛(ve);
+    }
+    after  {# System.out.println("Num"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚Seq[c1,c2]〛(ve) = ve0
+    {
+      ve1 = 〚c1〛(ve);
+      ve0 = 〚c2〛(ve1);
+    }
+    after  {# System.out.println("Num"); System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack()); #}
+  }
+  function 〚Program〛: #Void#
+  {
+    equation 〚Prog[c]〛 = none
+    {
+      ve0: #Env# = # new Env() #;
+      ve1 = 〚c〛(ve0);
+      none = # null; System.out.println("VARIABLES : " + ve0.printVariables()); System.out.println("STACK : " + ve0.printStack());  System.out.println("STACK HISTORY : " + ve0.printStackHistory());  System.out.println("Result  = " + ve1.peek()) # ;
+    }
+  }
+}
+// -------------------------------------------------------------------------
+// end of file
+// -------------------------------------------------------------------------

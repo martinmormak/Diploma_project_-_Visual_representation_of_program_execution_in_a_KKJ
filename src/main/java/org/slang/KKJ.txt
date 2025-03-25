@@ -1,0 +1,687 @@
+// -------------------------------------------------------------------------
+// KKJ.txt
+// SLANG version of the *denotational* semantics of a simple imperative language
+// (c) 2023 https://www.risc.jku.at/research/formal/software/SLANG
+// Martin Mormák <martin.mormak@student.tuke.sk>
+// -------------------------------------------------------------------------
+
+language KKJ
+{
+  target java
+  {
+    header
+    {#
+      package org.slang.lang.kkj;
+      import java.util.*;
+      import static org.slang.lang.kkj.KKJ.*;
+    #}
+  }
+
+  // ----------------------------------------------------------------------
+  // syntactic domains
+  // ----------------------------------------------------------------------
+  domains
+  {
+    Program = Prog[Sequence];
+    Sequence = Seq[Sequence,Sequence] + Cons[Constant] + ArithmeticOp[ArithmeticOperations] + LogicalOp[LogicalOperations] + StackOp[StackOperations] + FunctionOp[FunctionOperations] + ConditionsOp[ConditionsOperation];
+    Constant = Num[NUM] + True + False;
+    ArithmeticOperations = Add + Sub + Mul + Cmp;
+    LogicalOperations = Not + And + IsNeg + IsPos;
+    StackOperations = Clear + Id + Pop + Dup + Over + Swap + Rotl;
+    FunctionOperations = Compose + Apply + Applyover + Quote[Sequence];
+    ConditionsOperation = Choose + While;
+  }
+
+  // -----------------------------------------------------------------------
+  // printer
+  // -----------------------------------------------------------------------
+  printer
+  {
+    domain Program
+    {
+      case Prog[s] → # _result = s.toString(); #;
+    }
+    domain Sequence
+    {
+      case Seq[s1,s2] → # _result =  s1 + " " + s2; #;
+      case Cons[c] → # _result = c.toString(); #;
+      case ArithmeticOp[a] → # _result = a.toString(); #;
+      case LogicalOp[l] → # _result = l.toString(); #;
+      case StackOp[s] → # _result = s.toString(); #;
+      case FunctionOp[f] → # _result = f.toString(); #;
+      case ConditionsOp[o] → # _result = o.toString(); #;
+    }
+    domain Constant
+    {
+      case Num[n] → # _result = n; #;
+      case True → # _result = "TRUE"; #;
+      case False → # _result = "FALSE"; #;
+    }
+    domain ArithmeticOperations
+    {
+      case Add → # _result = "ADD"; #;
+      case Sub → # _result = "SUB"; #;
+      case Mul → # _result = "MUL"; #;
+      case Cmp → # _result = "CMP"; #;
+    }
+    domain LogicalOperations
+    {
+      case Not → # _result = "NOT"; #;
+      case And → # _result = "AND"; #;
+      case IsNeg → # _result = "ISNEG"; #;
+      case IsPos → # _result = "ISPOS"; #;
+    }
+    domain StackOperations
+    {
+      case Clear → # _result = "\n"; #;
+      case Id → # _result = "ID"; #;
+      case Pop → # _result = "POP"; #;
+      case Dup → # _result = "DUP"; #;
+      case Over → # _result = "OVER"; #;
+      case Swap → # _result = "SWAP"; #;
+      case Rotl → # _result = "ROTL"; #;
+    }
+    domain FunctionOperations
+    {
+      case Compose → # _result = "COMPOSE"; #;
+      case Apply → # _result = "APPLY"; #;
+      case Applyover → # _result = "APPLYOVER"; #;
+      case Quote[s] → # _result = "{" + s + "}"; #;
+    }
+    domain ConditionsOperation
+    {
+      case Choose → # _result = "IF"; #;
+      case While → # _result = "WHILE"; #;
+    }
+  }
+  
+  // -----------------------------------------------------------------------
+  // parser
+  // -----------------------------------------------------------------------
+  parser antlr4
+  {
+    domain Program
+    {
+      case # s=dSequence EOF # → Prog[s];
+    }
+    domain Sequence
+    {
+      case # s1=dSequence ' ' s2=dSequence # → Seq[s1,s2];
+      case # c=dConstant # → Cons[c];
+      case # a=dArithmeticOperations # → ArithmeticOp[a];
+      case # l=dLogicalOperations # → LogicalOp[l];
+      case # s=dStackOperations # → StackOp[s];
+      case # f=dFunctionOperations # → FunctionOp[f];
+      case # o=dConditionsOperation # → ConditionsOp[o];
+    }
+    domain Constant
+    {
+      case # n=dNUM # → Num[n];
+      case # 'TRUE' # → True;
+      case # 'FALSE' # → False;
+    }
+    domain ArithmeticOperations
+    {
+      case # 'ADD' # → Add;
+      case # 'SUB' # → Sub;
+      case # 'MUL' # → Mul;
+      case # 'CMP' # → Cmp;
+    }
+    domain LogicalOperations
+    {
+      case # 'NOT'# → Not;
+      case # 'AND' # → And;
+      case # 'ISNEG'# → IsNeg;
+      case # 'ISPOS'# → IsPos;
+    }
+    domain StackOperations
+    {
+      case # 'CLEAR'# → Clear;
+      case # 'ID' # → Id;
+      case # 'POP'# → Pop;
+      case # 'DUP'# → Dup;
+      case # 'OVER' # → Over;
+      case # 'SWAP'# → Swap;
+      case # 'ROTL'# → Rotl;
+    }
+    domain FunctionOperations
+    {
+      case # 'COMPOSE'# → Compose;
+      case # 'APPLY' # → Apply;
+      case # 'APPLYOVER'# → Applyover;
+      case # '{ ' + s=dSequence  + ' }'# → Quote[s];
+    }
+    domain ConditionsOperation
+    {
+      case # 'IF'# → Choose;
+      case # 'WHILE' # → While;
+    }
+  }
+  
+  // -----------------------------------------------------------------------
+  // type system
+  // -----------------------------------------------------------------------
+  code
+  {#
+    public enum Type { Int }
+    public static class Env
+    {
+      private HashMap<String,Value> variables = new HashMap<>();
+      private List<Stack<Value>> stacks = new LinkedList<>();
+      public Env()
+      { super(); stacks.add(new Stack<>()); }
+      public void put(String key, Value value)
+      { variables.put(key.toString(), value); }
+      public Value get(String key)
+      { return variables.get(key.toString()); }
+      public String printVariables()
+      { return variables.toString(); }
+      public void push(Value value)
+      { stacks.getLast().push(value); }
+      public Value peek()
+      { if (!stacks.getLast().isEmpty()) { return stacks.getLast().peek(); } else { throw new IllegalStateException("Cannot peek from an empty stack."); } }
+      public Value pop()
+      { if (!stacks.getLast().isEmpty()) { return stacks.getLast().pop(); } else { throw new IllegalStateException("Cannot pop from an empty stack."); } }
+      public String printStack()
+      { return stacks.getLast().toString(); }
+      public  String printStackHistory()
+      { return stacks.toString(); }
+      public void newStack()
+      { stacks.add(new Stack<>()); }
+    }
+    public static class TypeError extends RuntimeException
+    { public TypeError(String msg) { super(msg); } }
+    public static void check(Boolean b, String msg)
+    { if (!b) throw new TypeError(msg); }
+    sealed interface Value permits IntegerValue, StringValue, BoolValue { Object getValue(); }
+    record IntegerValue(Integer value) implements Value
+    { @Override public Integer getValue() { return value; } @Override public String toString() { return String.valueOf(value); } }
+    record StringValue(String value) implements Value
+    { @Override public String getValue() { return value; } @Override public String toString() { return value; } }
+    record BoolValue(Boolean value) implements Value
+    { @Override public Boolean getValue() { return value; } @Override public String toString() { return String.valueOf(value); } }
+  #}
+  judgment ⊢ Program: program
+  {
+    inference ⊢ Prog[s]: program
+    {
+      te: #Env# = #new Env()# ;
+      te ⊢ s: sequence;
+    }
+  }
+  judgment #Env# ⊢ Sequence: sequence
+  {
+    inference te ⊢ Seq[s1,s2]: sequence
+    {
+      te ⊢ s1: sequence;
+      te ⊢ s2: sequence;
+    }
+    inference te ⊢ Cons[c]: sequence
+    {
+      te ⊢ c: constatant;
+    }
+    inference te ⊢ ArithmeticOp[a]: sequence
+    {
+      te ⊢ a: aoperation;
+    }
+    inference te ⊢ LogicalOp[l]: sequence
+    {
+      te ⊢ l: loperation;
+    }
+    inference te ⊢ StackOp[s]: sequence
+    {
+      te ⊢ s: soperation;
+    }
+    inference te ⊢ FunctionOp[f]: sequence
+    {
+      te ⊢ f: foperation;
+    }
+    inference te ⊢ ConditionsOp[o]: sequence
+    {
+      te ⊢ o: ooperation;
+    }
+  }
+  judgment #Env# ⊢ Constant: constatant
+  {
+    inference te ⊢ Num[n]: constatant
+    {
+    }
+    inference te ⊢ True: constatant
+    {
+    }
+    inference te ⊢ False: constatant
+    {
+    }
+  }
+  judgment #Env# ⊢ ArithmeticOperations: aoperation
+  {
+    inference te ⊢ Add: aoperation
+    {
+    }
+    inference te ⊢ Sub: aoperation
+    {
+    }
+    inference te ⊢ Mul: aoperation
+    {
+    }
+    inference te ⊢ Cmp: aoperation
+    {
+    }
+  }
+  judgment #Env# ⊢ LogicalOperations: loperation
+  {
+    inference te ⊢ Not: loperation
+    {
+    }
+    inference te ⊢ And: loperation
+    {
+    }
+    inference te ⊢ IsNeg: loperation
+    {
+    }
+    inference te ⊢ IsPos: loperation
+    {
+    }
+  }
+  judgment #Env# ⊢ StackOperations: soperation
+  {
+    inference te ⊢ Clear: soperation
+    {
+    }
+    inference te ⊢ Id: soperation
+    {
+    }
+    inference te ⊢ Pop: soperation
+    {
+    }
+    inference te ⊢ Dup: soperation
+    {
+    }
+    inference te ⊢ Over: soperation
+    {
+    }
+    inference te ⊢ Swap: soperation
+    {
+    }
+    inference te ⊢ Rotl: soperation
+    {
+    }
+  }
+  judgment #Env# ⊢ FunctionOperations: foperation
+  {
+    inference te ⊢ Compose: foperation
+    {
+    }
+    inference te ⊢ Apply: foperation
+    {
+    }
+    inference te ⊢ Applyover: foperation
+    {
+    }
+    inference te ⊢ Quote[s]: foperation
+    {
+      te ⊢ s: sequence;
+    }
+  }
+  judgment #Env# ⊢ ConditionsOperation: ooperation
+  {
+    inference te ⊢ Choose: ooperation
+    {
+    }
+    inference te ⊢ While: ooperation
+    {
+    }
+  }
+  
+  // -----------------------------------------------------------------------
+  // denotational semantics
+  // -----------------------------------------------------------------------
+  code
+  {#
+    public static class Failure extends RuntimeException { }
+    public static void check(Boolean b) { if (!b) throw new Failure(); }
+  #}
+  function 〚Program〛: #Void#
+  {
+    equation 〚Prog[c]〛 = none
+    {
+      ve0: #Env# = # new Env() #;
+      ve1 = 〚c〛(ve0);
+      none = # null; System.out.println("Result"); System.out.println("STACK : " + ve0.printStack());  System.out.println("STACK HISTORY : " + ve0.printStackHistory());  System.out.println("Result  = " + ve1.peek()) # ;
+    }
+  }
+  function 〚Sequence〛: #Env# → #Env#
+  {
+    equation 〚Seq[s1,s2]〛(ve) = ve0
+    {
+      ve1 = 〚s1〛(ve);
+      ve0 = 〚s2〛(ve1);
+    }
+    equation 〚Cons[c]〛(ve) = ve0
+    {
+      ve0 = 〚c〛(ve);
+    }
+    equation 〚ArithmeticOp[a]〛(ve) = ve0
+    {
+      ve0 = 〚a〛(ve);
+    }
+    equation 〚LogicalOp[l]〛(ve) = ve0
+    {
+      ve0 = 〚l〛(ve);
+    }
+    equation 〚StackOp[s]〛(ve) = ve0
+    {
+      ve0 = 〚s〛(ve);
+    }
+    equation 〚FunctionOp[f]〛(ve) = ve0
+    {
+      ve0 = 〚f〛(ve);
+    }
+    equation 〚ConditionsOp[o]〛(ve) = ve0
+    {
+      ve0 = 〚o〛(ve);
+    }
+  }
+  function 〚Constant〛: #Env# → #Env#
+  {
+    equation 〚Num[n]〛(ve) = ve0
+    {
+      #
+        Value v = new IntegerValue(Integer.valueOf(n));
+        ve.push(v);
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Num"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); #}
+    equation 〚True〛(ve) = ve0
+    {
+      #
+        Value v = new BoolValue(true);
+        ve.push(v);
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("True"); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚False〛(ve) = ve0
+    {
+      #
+        Value v = new BoolValue(false);
+        ve.push(v);
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("False"); System.out.println("STACK : " + ve0.printStack()); #}
+  }
+  function 〚ArithmeticOperations〛: #Env# → #Env#
+  {
+    equation 〚Add〛(ve) = ve0
+    {
+      #
+        Value v1 = ve.peek();
+        Value v2 = ve.peek();
+        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
+          ve.pop();
+          ve.pop();
+          Value v = new IntegerValue(ev2.getValue() + ev1.getValue());
+          ve.push(v);
+        } else {
+          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
+        }
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Add"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); #}
+    equation 〚Sub〛(ve) = ve0
+    {
+      #
+        Value v1 = ve.peek();
+        Value v2 = ve.peek();
+        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
+          ve.pop();
+          ve.pop();
+          Value v = new IntegerValue(ev2.getValue() - ev1.getValue());
+          ve.push(v);
+        } else {
+          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
+        }
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Sub"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); #}
+    equation 〚Mul〛(ve) = ve0
+    {
+      #
+        Value v1 = ve.peek();
+        Value v2 = ve.peek();
+        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
+          ve.pop();
+          ve.pop();
+          Value v = new IntegerValue(ev2.getValue() * ev1.getValue());
+          ve.push(v);
+        } else {
+          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
+        }
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Mul"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); #}
+    equation 〚Cmp〛(ve) = ve0
+    {
+      #
+        Value v1 = ve.peek();
+        Value v2 = ve.peek();
+        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
+          ve.pop();
+          ve.pop();
+          if(ev1.getValue() < ev2.getValue()){
+            Value lv = new IntegerValue(1);
+            ve.push(lv);
+          } else if(ev1.getValue() > ev2.getValue()){
+            Value mv = new IntegerValue(-1);
+            ve.push(mv);
+          } else {
+            Value mv = new IntegerValue(0);
+            ve.push(mv);
+          }
+        } else {
+          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
+        }
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Cmp"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); #}
+  }
+  function 〚LogicalOperations〛: #Env# → #Env#
+  {
+    equation 〚Not〛(ve) = ve0
+    {
+      #
+        Value v0 = ve.peek();
+        if (v0 instanceof BoolValue bv0) {
+          ve.pop();
+          Value v = new BoolValue(!bv0.getValue());
+          ve.push(v);
+        } else {
+          throw new IllegalArgumentException("Both values must be BoolValue for logical operations.");
+        }
+      # 
+      ve0 = ve;
+    }
+    after  {# System.out.println("Not"); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚And〛(ve) = ve0
+    {
+      #
+        Value v1 = ve.peek();
+        Value v2 = ve.peek();
+        if (v1 instanceof BoolValue bv1 && v2 instanceof BoolValue bv2) {
+          ve.pop();
+          ve.pop();
+          Value v = new BoolValue(bv2.getValue() && bv1.getValue());
+          ve.push(v);
+        } else {
+          throw new IllegalArgumentException("Both values must be BoolValue for logical operations.");
+        }
+      # 
+      ve0 = ve;
+    }
+    after  {# System.out.println("And"); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚IsNeg〛(ve) = ve0
+    {
+      #
+        Value v = ve.peek();
+        if (v instanceof IntegerValue ev) {
+          ve.pop();
+          if(ev.getValue() < 0){
+            Value vt = new BoolValue(true);
+            ve.push(vt);
+          } else {
+            Value vf = new BoolValue(false);
+            ve.push(vf);
+          }
+        } else {
+          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
+        }
+      # 
+      ve0 = ve;
+    }
+    after  {# System.out.println("IsNeg"); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚IsPos〛(ve) = ve0
+    {
+      #
+        Value v = ve.peek();
+        if (v instanceof IntegerValue ev) {
+          ve.pop();
+          if(ev.getValue() > 0){
+            Value vt = new BoolValue(true);
+            ve.push(vt);
+          } else {
+            Value vf = new BoolValue(false);
+            ve.push(vf);
+          }
+        } else {
+          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
+        }
+      # 
+      ve0 = ve;
+    }
+    after  {# System.out.println("IsPos"); System.out.println("STACK : " + ve0.printStack()); #}
+  }
+  function 〚StackOperations〛: #Env# → #Env#
+  {
+    equation 〚Clear〛(ve) = ve0
+    {
+      #
+        ve.newStack();
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Clear"); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚Id〛(ve) = ve0
+    {
+      ve0 = ve;
+    }
+    after  {# System.out.println("Id"); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚Pop〛(ve) = ve0
+    {
+      #
+        ve.pop();
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Pop"); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚Dup〛(ve) = ve0
+    {
+      #
+        Value v = ve.peek();
+        ve.push(v);
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Dup"); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚Over〛(ve) = ve0
+    {
+      #
+        Value v1 = ve.pop();
+        Value v2 = ve.peek();
+        ve.push(v1);
+        ve.push(v2);
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Over"); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚Swap〛(ve) = ve0
+    {
+      #
+        Value v1 = ve.pop();
+        Value v2 = ve.pop();
+        ve.push(v2);
+        ve.push(v1);
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Swap"); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚Rotl〛(ve) = ve0
+    {
+      #
+        Value v1 = ve.pop();
+        Value v2 = ve.pop();
+        Value v3 = ve.pop();
+        ve.push(v2);
+        ve.push(v1);
+        ve.push(v3);
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Rotl"); System.out.println("STACK : " + ve0.printStack()); #}
+  }
+  function 〚FunctionOperations〛: #Env# → #Env#
+  {
+    equation 〚Compose〛(ve) = ve0
+    {
+      #
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Compose"); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚Apply〛(ve) = ve0
+    {
+      #
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Apply"); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚Applyover〛(ve) = ve0
+    {
+      #
+        ve.pop();
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Applyover"); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚Quote[s]〛(ve) = ve0
+    {
+      ve0 = 〚s〛(ve);
+    }
+    after  {# System.out.println("Quote"); System.out.println("STACK : " + ve0.printStack()); #}
+  }
+  function 〚ConditionsOperation〛: #Env# → #Env#
+  {
+    equation 〚Choose〛(ve) = ve0
+    {
+      #
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("Choose"); System.out.println("STACK : " + ve0.printStack()); #}
+    equation 〚While〛(ve) = ve0
+    {
+      #
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("While"); System.out.println("STACK : " + ve0.printStack()); #}
+  }
+}
+// -------------------------------------------------------------------------
+// end of file
+// -------------------------------------------------------------------------

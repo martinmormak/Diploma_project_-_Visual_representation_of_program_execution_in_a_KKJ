@@ -1,0 +1,62 @@
+package org.termRewriting.tokens.constant;
+
+import org.termRewriting.tokens.interfaces.ILogicToken;
+import org.termRewriting.tokens.interfaces.IToken;
+
+import java.util.List;
+
+public class BoolToken implements ILogicToken {
+    private Boolean value;
+
+    public BoolToken(Boolean value) {
+        this.value = value;
+    }
+
+    public BoolToken(String value) {
+        if (value == null) {
+            System.err.println("Value cannot be null!");
+        } else if (value.equalsIgnoreCase("true")) {
+            this.value = true;
+        } else if (value.equalsIgnoreCase("false")) {
+            this.value = false;
+        } else {
+            System.err.println("Value must be either 'true' or 'false'!");
+        }
+    }
+
+    public void setValue(Boolean value) {
+        this.value = value;
+    }
+
+    public void setValue(String value) {
+        if (value == null) {
+            System.err.println("Value cannot be null!");
+        } else if (value.equalsIgnoreCase("true")) {
+            this.value = true;
+        } else if (value.equalsIgnoreCase("false")) {
+            this.value = false;
+        } else {
+            System.err.println("Value must be either 'true' or 'false'!");
+        }
+    }
+
+    @Override
+    public List<Class<? extends IToken>> getAvailableTokenList() {
+        return List.of(ILogicToken.class);
+    }
+
+    @Override
+    public Boolean getValue() {
+        return value;
+    }
+
+    @Override
+    public List<IToken> minimalize() {
+        return List.of(this);
+    }
+
+    @Override
+    public String toString() {
+        return value.toString();
+    }
+}

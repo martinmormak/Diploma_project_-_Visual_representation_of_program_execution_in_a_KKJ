@@ -1,0 +1,31 @@
+Program → Sequence;
+
+Sequence → Command | Command Sequence;
+
+Command → NumberExpression | BoolExpression | SpecialExpression Command;
+
+BoolExpression → BoolExpression SpecialExpression | True | False | BoolExpression ' NOT' | BoolExpression BoolExpression ' AND' | NumberExpression ' ISNEG' | NumberExpression ' ISPOS';
+
+NumberExpression → NumberExpression SpecialExpression | NUM | NumberExpression NumberExpression ' ADD' | NumberExpression NumberExpression ' SUB' | NumberExpression NumberExpression ' MUL' | NumberExpression NumberExpression ' CMP';
+
+SpecialExpression = Command ' POP';
+
+
+
+
+1 2 ADD 3 4 POP MUL 5 SUB
+1 2 ADD 3 POP 4 MUL 5 SUB
+1 POP 2 3 ADD 4 MUL 5 SUB
+1 2 POP POP 3 4 ADD 5 MUL
+
+Program → Sequence;
+
+Sequence → Command | Command Sequence;
+
+Command → NumberExpression | BoolExpression | Command ' POP';
+
+BoolExpression → True | False | BoolExpression ' NOT' | BoolExpression BoolExpression ' AND' | NumberExpression ' ISNEG' | NumberExpression ' ISPOS';
+
+NumberExpression → NUM | NumberExpression NumberExpression ' ADD' | NumberExpression NumberExpression ' SUB' | NumberExpression NumberExpression ' MUL' | NumberExpression NumberExpression ' CMP';
+
+SpecialExpression = Command ' POP';
