@@ -2,13 +2,14 @@ package org.termRewriting.tokens.stack;
 
 import org.termRewriting.tokens.constant.BoolToken;
 import org.termRewriting.tokens.constant.IntToken;
+import org.termRewriting.tokens.interfaces.IFunctionToken;
 import org.termRewriting.tokens.interfaces.ILogicToken;
 import org.termRewriting.tokens.interfaces.IToken;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class ClearToken implements IToken {
+public class ClearToken implements IFunctionToken {
     private List<IToken> tokens;
 
     public ClearToken(List<IToken> tokens) {

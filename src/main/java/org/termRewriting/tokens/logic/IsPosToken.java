@@ -3,6 +3,7 @@ package org.termRewriting.tokens.logic;
 import org.termRewriting.tokens.constant.BoolToken;
 import org.termRewriting.tokens.constant.IntToken;
 import org.termRewriting.tokens.interfaces.IArithmeticToken;
+import org.termRewriting.tokens.interfaces.IFunctionToken;
 import org.termRewriting.tokens.interfaces.ILogicToken;
 import org.termRewriting.tokens.interfaces.IToken;
 
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class IsPosToken implements ILogicToken {
+public class IsPosToken implements IFunctionToken {
     private List<IToken> tokens;
 
     public IsPosToken(List<IToken> tokens) {

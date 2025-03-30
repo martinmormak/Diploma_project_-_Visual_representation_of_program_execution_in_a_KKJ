@@ -2,6 +2,7 @@ package org.termRewriting.tokens.logic;
 
 import org.termRewriting.tokens.constant.BoolToken;
 import org.termRewriting.tokens.constant.IntToken;
+import org.termRewriting.tokens.interfaces.IFunctionToken;
 import org.termRewriting.tokens.interfaces.ILogicToken;
 import org.termRewriting.tokens.interfaces.IToken;
 
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AndToken implements ILogicToken {
+public class AndToken implements IFunctionToken {
     private List<IToken> tokens;
 
     public AndToken(List<IToken> tokens) {
@@ -44,7 +45,7 @@ public class AndToken implements ILogicToken {
         List<IToken> newTokens =  new LinkedList<>();
         boolean onlyPrimitiveTypes = true;
         for(IToken token : tokens){
-            if(!(tokens.getLast() instanceof BoolToken)){
+            if(!(token instanceof BoolToken)){
                 onlyPrimitiveTypes = false;
             }
             newTokens.addAll(token.minimalize());

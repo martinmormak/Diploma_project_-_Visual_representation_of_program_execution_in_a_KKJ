@@ -3,13 +3,14 @@ package org.termRewriting.tokens.aritmetic;
 import org.termRewriting.tokens.constant.BoolToken;
 import org.termRewriting.tokens.constant.IntToken;
 import org.termRewriting.tokens.interfaces.IArithmeticToken;
+import org.termRewriting.tokens.interfaces.IFunctionToken;
 import org.termRewriting.tokens.interfaces.IToken;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SubToken implements IArithmeticToken {
+public class SubToken implements IFunctionToken {
     private List<IToken> tokens;
 
     public SubToken(List<IToken> tokens) {
@@ -44,7 +45,7 @@ public class SubToken implements IArithmeticToken {
         List<IToken> newTokens =  new LinkedList<>();
         boolean onlyPrimitiveTypes = true;
         for(IToken token : tokens){
-            if(!(tokens.getLast() instanceof IntToken)){
+            if(!(token instanceof IntToken)){
                 onlyPrimitiveTypes = false;
             }
             newTokens.addAll(token.minimalize());

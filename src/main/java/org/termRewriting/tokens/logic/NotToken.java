@@ -2,6 +2,7 @@ package org.termRewriting.tokens.logic;
 
 import org.termRewriting.tokens.constant.BoolToken;
 import org.termRewriting.tokens.constant.IntToken;
+import org.termRewriting.tokens.interfaces.IFunctionToken;
 import org.termRewriting.tokens.interfaces.ILogicToken;
 import org.termRewriting.tokens.interfaces.IToken;
 
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class NotToken implements ILogicToken {
+public class NotToken implements IFunctionToken {
     private List<IToken> tokens;
 
     public NotToken(List<IToken> tokens) {

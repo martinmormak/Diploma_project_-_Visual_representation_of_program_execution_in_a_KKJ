@@ -2,13 +2,14 @@ package org.termRewriting.tokens.stack;
 
 import org.termRewriting.tokens.constant.BoolToken;
 import org.termRewriting.tokens.constant.IntToken;
+import org.termRewriting.tokens.interfaces.IFunctionToken;
 import org.termRewriting.tokens.interfaces.IToken;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SwapToken implements IToken {
+public class SwapToken implements IFunctionToken {
     private List<IToken> tokens;
 
     public SwapToken(List<IToken> tokens) {
