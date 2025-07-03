@@ -4,6 +4,7 @@ import org.termRewriting.tokens.interfaces.ILogicToken;
 import org.termRewriting.tokens.interfaces.IToken;
 
 import java.util.List;
+import java.util.Stack;
 
 public class BoolToken implements ILogicToken {
     private Boolean value;
@@ -51,12 +52,18 @@ public class BoolToken implements ILogicToken {
     }
 
     @Override
-    public List<IToken> minimalize() {
+    public List<IToken> termRewritingSolving(List<String> substitutions) {
         return List.of(this);
     }
 
     @Override
+    public List<IToken> stackSolving(Stack<IToken> stack) {
+        stack.push(this);
+        return null;
+    }
+
+    @Override
     public String toString() {
-        return value.toString();
+        return value.toString().toUpperCase();
     }
 }

@@ -20,7 +20,7 @@ public class ConfigReader {
             JsonNode config = objectMapper.readTree(inputStream);
 
             // Read data from JSON
-            return config.get("slangEnabled").asBoolean();
+            return config.get(toggle).asBoolean();
 
         } catch (IOException e) {
             System.err.println("Error while reading file " + e);

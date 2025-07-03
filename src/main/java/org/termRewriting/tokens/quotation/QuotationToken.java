@@ -1,10 +1,7 @@
-package org.termRewriting.tokens.logic;
+package org.termRewriting.tokens.quotation;
 
 import org.termRewriting.tokens.constant.BoolToken;
 import org.termRewriting.tokens.constant.IntToken;
-import org.termRewriting.tokens.interfaces.IArithmeticToken;
-import org.termRewriting.tokens.interfaces.IFunctionToken;
-import org.termRewriting.tokens.interfaces.ILogicToken;
 import org.termRewriting.tokens.interfaces.IToken;
 
 import java.util.ArrayList;
@@ -12,10 +9,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
-public class IsPosToken implements IFunctionToken {
+public class QuotationToken implements IToken {
     private List<IToken> tokens;
 
-    public IsPosToken(List<IToken> tokens) {
+    public QuotationToken(List<IToken> tokens) {
         this.tokens = tokens;
     }
 
@@ -26,18 +23,13 @@ public class IsPosToken implements IFunctionToken {
             availableTokensFormToken.addAll(new ArrayList<>(token.getAvailableTokenList()));
         }
 
-        if(availableTokensFormToken.removeLast() == IArithmeticToken.class) {
-            availableTokensFormToken.add(ILogicToken.class);
-            return availableTokensFormToken;
-        }else {
-            throw new RuntimeException("Expected one numeral but dont get it for IsPosToken");
-        }
+        return availableTokensFormToken;
     }
 
     @Override
-    public Boolean getValue() {
-        if(tokens.getLast() instanceof IntToken) {
-            return ((IntToken)tokens.getLast()).getValue() > 0;
+    public Integer getValue() {
+        if(tokens.getLast() instanceof IntToken && tokens.get(tokens.size()-2) instanceof IntToken) {
+            return ((IntToken)tokens.getLast()).getValue() + ((IntToken)tokens.get(tokens.size()-2)).getValue();
         }
         return null;
     }
@@ -47,17 +39,14 @@ public class IsPosToken implements IFunctionToken {
         List<IToken> newTokens =  new LinkedList<>();
         boolean onlyPrimitiveTypes = true;
         for(IToken token : tokens){
-            if(!(token instanceof IntToken)){
+            if(!(token instanceof IntToken) && !(token instanceof BoolToken)) {
                 onlyPrimitiveTypes = false;
             }
             newTokens.addAll(token.termRewritingSolving(substitutions));
         }
         tokens = newTokens;
         if(onlyPrimitiveTypes) {
-            IToken result = new BoolToken(getValue());
-            substitutions.add(this + " -> " + result.getValue());
-            tokens.removeLast();
-            tokens.add(result);
+            substitutions.add(toString());
             return tokens;
         }else {
             return List.of(this);
@@ -72,19 +61,16 @@ public class IsPosToken implements IFunctionToken {
             }
             return List.of(this);
         }
-        if(!stack.isEmpty()) {
-            IToken result = new BoolToken(((IntToken) stack.pop()).getValue() > 0);
-            stack.push(result);
-        }
         return null;
     }
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{ ");
         for(IToken token : tokens){
             stringBuilder.append(token).append(" ");
         }
-        return stringBuilder.append("ISPOS").toString();
+        return stringBuilder.append("} ").toString();
     }
 }

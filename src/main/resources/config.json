@@ -1,3 +1,4 @@
 {
-  "slangEnabled": false
+  "slangEnabled": false,
+  "termRewritingEnabled": false
 }

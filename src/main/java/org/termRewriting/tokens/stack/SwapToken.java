@@ -8,6 +8,7 @@ import org.termRewriting.tokens.interfaces.IToken;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 public class SwapToken implements IFunctionToken {
     private List<IToken> tokens;
@@ -23,7 +24,7 @@ public class SwapToken implements IFunctionToken {
             availableTokensFormToken.addAll(new ArrayList<>(token.getAvailableTokenList()));
         }
 
-        availableTokensFormToken.add(availableTokensFormToken.getLast());
+        availableTokensFormToken.add(availableTokensFormToken.remove(availableTokensFormToken.size()-2));
         return availableTokensFormToken;
     }
 
@@ -33,25 +34,40 @@ public class SwapToken implements IFunctionToken {
     }
 
     @Override
-    public List<IToken> minimalize() {
+    public List<IToken> termRewritingSolving(List<String> substitutions) {
         List<IToken> newTokens =  new LinkedList<>();
         boolean onlyPrimitiveTypes = true;
         for(IToken token : tokens){
             if(!(token instanceof BoolToken) && !(token instanceof IntToken)){
                 onlyPrimitiveTypes = false;
             }
-            newTokens.addAll(token.minimalize());
+            newTokens.addAll(token.termRewritingSolving(substitutions));
         }
         tokens = newTokens;
         if(onlyPrimitiveTypes) {
-            IToken top = tokens.removeLast();
-            IToken secondTop = tokens.removeLast();
-            tokens.add(top);
-            tokens.add(secondTop);
+            substitutions.add(this + " -> " + tokens.getLast() + " " + tokens.get(tokens.size()-2));
+            tokens.add(tokens.remove(tokens.size()-2));
             return tokens;
         }else {
             return List.of(this);
         }
+    }
+
+    @Override
+    public List<IToken> stackSolving(Stack<IToken> stack) {
+        if(!tokens.isEmpty()) {
+            if(tokens.getFirst().stackSolving(stack) == null) {
+                tokens.removeFirst();
+            }
+            return List.of(this);
+        }
+        if(stack.size()>=2) {
+            IToken pop1 = stack.pop();
+            IToken pop2 = stack.pop();
+            stack.push(pop1);
+            stack.push(pop2);
+        }
+        return null;
     }
 
     @Override

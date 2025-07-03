@@ -4,6 +4,7 @@ import org.termRewriting.tokens.interfaces.IArithmeticToken;
 import org.termRewriting.tokens.interfaces.IToken;
 
 import java.util.List;
+import java.util.Stack;
 
 public class IntToken implements IArithmeticToken {
     private Integer value;
@@ -35,8 +36,14 @@ public class IntToken implements IArithmeticToken {
     }
 
     @Override
-    public List<IToken> minimalize() {
+    public List<IToken> termRewritingSolving(List<String> substitutions) {
         return List.of(this);
+    }
+
+    @Override
+    public List<IToken> stackSolving(Stack<IToken> stack) {
+        stack.push(this);
+        return null;
     }
 
     @Override

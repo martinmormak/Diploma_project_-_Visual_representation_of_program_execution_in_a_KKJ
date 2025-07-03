@@ -28,7 +28,7 @@ language KKJ
     ArithmeticOperations = Add + Sub + Mul + Cmp;
     LogicalOperations = Not + And + IsNeg + IsPos;
     StackOperations = Clear + Id + Pop + Dup + Over + Swap + Rotl;
-    FunctionOperations = Compose + Apply + Applyover + Quote[Sequence];
+    FunctionOperations = Compose + Apply + ApplyOver + Quote[Sequence];
     ConditionsOperation = Choose + While;
   }
 
@@ -85,7 +85,7 @@ language KKJ
     {
       case Compose → # _result = "COMPOSE"; #;
       case Apply → # _result = "APPLY"; #;
-      case Applyover → # _result = "APPLYOVER"; #;
+      case ApplyOver → # _result = "APPLYOVER"; #;
       case Quote[s] → # _result = "{" + s + "}"; #;
     }
     domain ConditionsOperation
@@ -148,7 +148,7 @@ language KKJ
     {
       case # 'COMPOSE'# → Compose;
       case # 'APPLY' # → Apply;
-      case # 'APPLYOVER'# → Applyover;
+      case # 'APPLYOVER'# → ApplyOver;
       case # '{ ' + s=dSequence  + ' }'# → Quote[s];
     }
     domain ConditionsOperation
@@ -315,7 +315,7 @@ language KKJ
     inference te ⊢ Apply: foperation
     {
     }
-    inference te ⊢ Applyover: foperation
+    inference te ⊢ ApplyOver: foperation
     {
     }
     inference te ⊢ Quote[s]: foperation
@@ -650,14 +650,14 @@ language KKJ
       ve0 = ve;
     }
     after  {# System.out.println("Apply"); System.out.println("STACK : " + ve0.printStack()); #}
-    equation 〚Applyover〛(ve) = ve0
+    equation 〚ApplyOver〛(ve) = ve0
     {
       #
         ve.pop();
       #
       ve0 = ve;
     }
-    after  {# System.out.println("Applyover"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("ApplyOver"); System.out.println("STACK : " + ve0.printStack()); #}
     equation 〚Quote[s]〛(ve) = ve0
     {
       ve0 = 〚s〛(ve);

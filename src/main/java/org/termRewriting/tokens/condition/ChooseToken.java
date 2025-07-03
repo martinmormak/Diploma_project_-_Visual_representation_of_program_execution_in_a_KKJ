@@ -1,9 +1,9 @@
-package org.termRewriting.tokens.logic;
+package org.termRewriting.tokens.condition;
 
 import org.termRewriting.tokens.constant.BoolToken;
 import org.termRewriting.tokens.constant.IntToken;
 import org.termRewriting.tokens.interfaces.IArithmeticToken;
-import org.termRewriting.tokens.interfaces.IFunctionToken;
+import org.termRewriting.tokens.interfaces.IConditionToken;
 import org.termRewriting.tokens.interfaces.ILogicToken;
 import org.termRewriting.tokens.interfaces.IToken;
 
@@ -12,10 +12,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
-public class IsPosToken implements IFunctionToken {
+public class ChooseToken implements IConditionToken {
     private List<IToken> tokens;
 
-    public IsPosToken(List<IToken> tokens) {
+    public ChooseToken(List<IToken> tokens) {
         this.tokens = tokens;
     }
 
@@ -26,18 +26,23 @@ public class IsPosToken implements IFunctionToken {
             availableTokensFormToken.addAll(new ArrayList<>(token.getAvailableTokenList()));
         }
 
-        if(availableTokensFormToken.removeLast() == IArithmeticToken.class) {
-            availableTokensFormToken.add(ILogicToken.class);
+        if(((availableTokensFormToken.getLast() == IArithmeticToken.class && availableTokensFormToken.get(tokens.size()-2) == IArithmeticToken.class) || (availableTokensFormToken.getLast() == ILogicToken.class && availableTokensFormToken.get(tokens.size()-2) == ILogicToken.class)) && availableTokensFormToken.get(tokens.size()-3) == ILogicToken.class) {
+            availableTokensFormToken.remove(tokens.size()-3);
+            availableTokensFormToken.remove(tokens.size()-2);
             return availableTokensFormToken;
         }else {
-            throw new RuntimeException("Expected one numeral but dont get it for IsPosToken");
+            throw new RuntimeException("Expected bool and two numerals/boolean but dont get it for ChooseToken");
         }
     }
 
     @Override
-    public Boolean getValue() {
-        if(tokens.getLast() instanceof IntToken) {
-            return ((IntToken)tokens.getLast()).getValue() > 0;
+    public IToken getValue() {
+        if(tokens.get(tokens.size()-3) instanceof BoolToken) {
+            if(((BoolToken)tokens.get(tokens.size()-3)).getValue() == true) {
+                return tokens.get(tokens.size() - 2);
+            } else {
+                return tokens.getLast();
+            }
         }
         return null;
     }
@@ -47,15 +52,17 @@ public class IsPosToken implements IFunctionToken {
         List<IToken> newTokens =  new LinkedList<>();
         boolean onlyPrimitiveTypes = true;
         for(IToken token : tokens){
-            if(!(token instanceof IntToken)){
+            if(!(token instanceof IntToken) && !(token instanceof BoolToken)) {
                 onlyPrimitiveTypes = false;
             }
             newTokens.addAll(token.termRewritingSolving(substitutions));
         }
         tokens = newTokens;
         if(onlyPrimitiveTypes) {
-            IToken result = new BoolToken(getValue());
+            IToken result = getValue();
             substitutions.add(this + " -> " + result.getValue());
+            tokens.removeLast();
+            tokens.removeLast();
             tokens.removeLast();
             tokens.add(result);
             return tokens;
@@ -72,9 +79,15 @@ public class IsPosToken implements IFunctionToken {
             }
             return List.of(this);
         }
-        if(!stack.isEmpty()) {
-            IToken result = new BoolToken(((IntToken) stack.pop()).getValue() > 0);
-            stack.push(result);
+        if(stack.size()>=3) {
+            IToken secound = stack.pop();
+            IToken first = stack.pop();
+            BoolToken condition = (BoolToken) stack.pop();
+            if (condition.getValue() == true) {
+                stack.push(first);
+            } else {
+                stack.push(secound);
+            }
         }
         return null;
     }
@@ -85,6 +98,6 @@ public class IsPosToken implements IFunctionToken {
         for(IToken token : tokens){
             stringBuilder.append(token).append(" ");
         }
-        return stringBuilder.append("ISPOS").toString();
+        return stringBuilder.append("CHOOSE").toString();
     }
 }
