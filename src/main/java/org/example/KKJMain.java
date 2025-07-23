@@ -1,10 +1,10 @@
 package org.example;
 
 import org.slang.lang.kkj.*;
-import org.termRewriting.Tokenizer;
-import org.termRewriting.tokens.constant.BoolToken;
-import org.termRewriting.tokens.constant.IntToken;
-import org.termRewriting.tokens.interfaces.IToken;
+import org.core.Tokenizer;
+import org.core.tokens.constant.BoolToken;
+import org.core.tokens.constant.IntToken;
+import org.core.tokens.interfaces.IToken;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -81,8 +81,8 @@ public class KKJMain {
                             }
                         }
                         System.out.print("\t\t");
-                        for(String substitution : substitutions) {
-                            System.out.print(substitution + ", ");
+                        for(int index = substitutions.size() - 1; index >= 0; index--) {
+                            System.out.print(substitutions.get(index) + ", ");
                         }
                         System.out.println();
                         token = newTokens.getFirst();
