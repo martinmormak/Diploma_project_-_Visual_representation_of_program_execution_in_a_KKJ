@@ -1,0 +1,567 @@
+// -------------------------------------------------------------------------
+// KKJ.txt
+// SLANG version of the *denotational* semantics of a simple imperative language
+// (c) 2023 https://www.risc.jku.at/research/formal/software/SLANG
+// Martin Mormák <martin.mormak@student.tuke.sk>
+// -------------------------------------------------------------------------
+
+language KKJ
+{
+  target java
+  {
+    header
+    {#
+      package org.slang.lang.kkj;
+      import java.util.*;
+
+      import org.core.tokens.arithmetic.*;
+      import org.core.tokens.condition.*;
+      import org.core.tokens.constant.*;
+      import org.core.tokens.functions.*;
+      import org.core.tokens.interfaces.*;
+      import org.core.tokens.logic.*;
+      import org.core.tokens.quotation.*;
+      import org.core.tokens.stack.*;
+      import static org.slang.lang.kkj.KKJ.*;
+    #}
+  }
+
+  // ----------------------------------------------------------------------
+  // syntactic domains
+  // ----------------------------------------------------------------------
+  domains
+  {
+    Program = Prog[Sequence];
+    Sequence = Seq[Sequence,Sequence] + Cons[Constant] + ArithmeticOp[ArithmeticOperations] + LogicalOp[LogicalOperations] + StackOp[StackOperations] + FunctionOp[FunctionOperations] + ConditionsOp[ConditionsOperation];
+    Constant = Num[NUM] + True + False;
+    ArithmeticOperations = Add + Sub + Mul + Cmp;
+    LogicalOperations = Not + And + IsNeg + IsPos;
+    StackOperations = Clear + Id + Pop + Dup + Over + Swap + Rotl;
+    FunctionOperations = Compose + Apply + ApplyOver + Quote[Sequence];
+    ConditionsOperation = Choose + While;
+  }
+
+  // -----------------------------------------------------------------------
+  // printer
+  // -----------------------------------------------------------------------
+  printer
+  {
+    domain Program
+    {
+      case Prog[s] → # _result = s.toString(); #;
+    }
+    domain Sequence
+    {
+      case Seq[s1,s2] → # _result =  s1 + " " + s2; #;
+      case Cons[c] → # _result = c.toString(); #;
+      case ArithmeticOp[a] → # _result = a.toString(); #;
+      case LogicalOp[l] → # _result = l.toString(); #;
+      case StackOp[s] → # _result = s.toString(); #;
+      case FunctionOp[f] → # _result = f.toString(); #;
+      case ConditionsOp[o] → # _result = o.toString(); #;
+    }
+    domain Constant
+    {
+      case Num[n] → # _result = n; #;
+      case True → # _result = "TRUE"; #;
+      case False → # _result = "FALSE"; #;
+    }
+    domain ArithmeticOperations
+    {
+      case Add → # _result = "ADD"; #;
+      case Sub → # _result = "SUB"; #;
+      case Mul → # _result = "MUL"; #;
+      case Cmp → # _result = "CMP"; #;
+    }
+    domain LogicalOperations
+    {
+      case Not → # _result = "NOT"; #;
+      case And → # _result = "AND"; #;
+      case IsNeg → # _result = "ISNEG"; #;
+      case IsPos → # _result = "ISPOS"; #;
+    }
+    domain StackOperations
+    {
+      case Clear → # _result = "\n"; #;
+      case Id → # _result = "ID"; #;
+      case Pop → # _result = "POP"; #;
+      case Dup → # _result = "DUP"; #;
+      case Over → # _result = "OVER"; #;
+      case Swap → # _result = "SWAP"; #;
+      case Rotl → # _result = "ROTL"; #;
+    }
+    domain FunctionOperations
+    {
+      case Compose → # _result = "COMPOSE"; #;
+      case Apply → # _result = "APPLY"; #;
+      case ApplyOver → # _result = "APPLYOVER"; #;
+      case Quote[s] → # _result = "{" + s + "}"; #;
+    }
+    domain ConditionsOperation
+    {
+      case Choose → # _result = "IF"; #;
+      case While → # _result = "WHILE"; #;
+    }
+  }
+  
+  // -----------------------------------------------------------------------
+  // parser
+  // -----------------------------------------------------------------------
+  parser antlr4
+  {
+    domain Program
+    {
+      case # s=dSequence EOF # → Prog[s];
+    }
+    domain Sequence
+    {
+      case # s1=dSequence ' ' s2=dSequence # → Seq[s1,s2];
+      case # c=dConstant # → Cons[c];
+      case # a=dArithmeticOperations # → ArithmeticOp[a];
+      case # l=dLogicalOperations # → LogicalOp[l];
+      case # s=dStackOperations # → StackOp[s];
+      case # f=dFunctionOperations # → FunctionOp[f];
+      case # o=dConditionsOperation # → ConditionsOp[o];
+    }
+    domain Constant
+    {
+      case # n=dNUM # → Num[n];
+      case # 'TRUE' # → True;
+      case # 'FALSE' # → False;
+    }
+    domain ArithmeticOperations
+    {
+      case # 'ADD' # → Add;
+      case # 'SUB' # → Sub;
+      case # 'MUL' # → Mul;
+      case # 'CMP' # → Cmp;
+    }
+    domain LogicalOperations
+    {
+      case # 'NOT'# → Not;
+      case # 'AND' # → And;
+      case # 'ISNEG'# → IsNeg;
+      case # 'ISPOS'# → IsPos;
+    }
+    domain StackOperations
+    {
+      case # 'CLEAR'# → Clear;
+      case # 'ID' # → Id;
+      case # 'POP'# → Pop;
+      case # 'DUP'# → Dup;
+      case # 'OVER' # → Over;
+      case # 'SWAP'# → Swap;
+      case # 'ROTL'# → Rotl;
+    }
+    domain FunctionOperations
+    {
+      case # 'COMPOSE'# → Compose;
+      case # 'APPLY' # → Apply;
+      case # 'APPLYOVER'# → ApplyOver;
+      case # '{ ' + s=dSequence  + ' }'# → Quote[s];
+    }
+    domain ConditionsOperation
+    {
+      case # 'IF'# → Choose;
+      case # 'WHILE' # → While;
+    }
+  }
+  
+  // -----------------------------------------------------------------------
+  // type system
+  // -----------------------------------------------------------------------
+  code
+  {#
+  #}
+  judgment ⊢ Program: program
+  {
+    inference ⊢ Prog[s]: program
+    {
+      te: #List<IToken># = #new LinkedList<>()# ;
+      te ⊢ s: sequence;
+    }
+  }
+  judgment #List<IToken># ⊢ Sequence: sequence
+  {
+    inference te ⊢ Seq[s1,s2]: sequence
+    {
+      te ⊢ s1: sequence;
+      te ⊢ s2: sequence;
+    }
+    inference te ⊢ Cons[c]: sequence
+    {
+      te ⊢ c: constatant;
+    }
+    inference te ⊢ ArithmeticOp[a]: sequence
+    {
+      te ⊢ a: aoperation;
+    }
+    inference te ⊢ LogicalOp[l]: sequence
+    {
+      te ⊢ l: loperation;
+    }
+    inference te ⊢ StackOp[s]: sequence
+    {
+      te ⊢ s: soperation;
+    }
+    inference te ⊢ FunctionOp[f]: sequence
+    {
+      te ⊢ f: foperation;
+    }
+    inference te ⊢ ConditionsOp[o]: sequence
+    {
+      te ⊢ o: ooperation;
+    }
+  }
+  judgment #List<IToken># ⊢ Constant: constatant
+  {
+    inference te ⊢ Num[n]: constatant
+    {
+    }
+    inference te ⊢ True: constatant
+    {
+    }
+    inference te ⊢ False: constatant
+    {
+    }
+  }
+  judgment #List<IToken># ⊢ ArithmeticOperations: aoperation
+  {
+    inference te ⊢ Add: aoperation
+    {
+    }
+    inference te ⊢ Sub: aoperation
+    {
+    }
+    inference te ⊢ Mul: aoperation
+    {
+    }
+    inference te ⊢ Cmp: aoperation
+    {
+    }
+  }
+  judgment #List<IToken># ⊢ LogicalOperations: loperation
+  {
+    inference te ⊢ Not: loperation
+    {
+    }
+    inference te ⊢ And: loperation
+    {
+    }
+    inference te ⊢ IsNeg: loperation
+    {
+    }
+    inference te ⊢ IsPos: loperation
+    {
+    }
+  }
+  judgment #List<IToken># ⊢ StackOperations: soperation
+  {
+    inference te ⊢ Clear: soperation
+    {
+    }
+    inference te ⊢ Id: soperation
+    {
+    }
+    inference te ⊢ Pop: soperation
+    {
+    }
+    inference te ⊢ Dup: soperation
+    {
+    }
+    inference te ⊢ Over: soperation
+    {
+    }
+    inference te ⊢ Swap: soperation
+    {
+    }
+    inference te ⊢ Rotl: soperation
+    {
+    }
+  }
+  judgment #List<IToken># ⊢ FunctionOperations: foperation
+  {
+    inference te ⊢ Compose: foperation
+    {
+    }
+    inference te ⊢ Apply: foperation
+    {
+    }
+    inference te ⊢ ApplyOver: foperation
+    {
+    }
+    inference te ⊢ Quote[s]: foperation
+    {
+      te ⊢ s: sequence;
+    }
+  }
+  judgment #List<IToken># ⊢ ConditionsOperation: ooperation
+  {
+    inference te ⊢ Choose: ooperation
+    {
+    }
+    inference te ⊢ While: ooperation
+    {
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // denotational semantics
+  // -----------------------------------------------------------------------
+  code
+  {#
+    public static class Failure extends RuntimeException { }
+    public static void check(Boolean b) { if (!b) throw new Failure(); }
+  #}
+  function 〚Program〛: #List<IToken>#
+  {
+    equation 〚Prog[c]〛 = tokens
+    {
+      ve0: #List<IToken># = # new LinkedList<>() #;
+      tokens =〚c〛(ve0); # System.out.println("TokensList : " + ve0.toString()); #
+    }
+  }
+  function 〚Sequence〛: #List<IToken># → #List<IToken>#
+  {
+    equation 〚Seq[s1,s2]〛(ve) = ve0
+    {
+      ve1 = 〚s1〛(ve);
+      ve0 = 〚s2〛(ve1);
+    }
+    equation 〚Cons[c]〛(ve) = ve0
+    {
+      ve0 = 〚c〛(ve);
+    }
+    equation 〚ArithmeticOp[a]〛(ve) = ve0
+    {
+      ve0 = 〚a〛(ve);
+    }
+    equation 〚LogicalOp[l]〛(ve) = ve0
+    {
+      ve0 = 〚l〛(ve);
+    }
+    equation 〚StackOp[s]〛(ve) = ve0
+    {
+      ve0 = 〚s〛(ve);
+    }
+    equation 〚FunctionOp[f]〛(ve) = ve0
+    {
+      ve0 = 〚f〛(ve);
+    }
+    equation 〚ConditionsOp[o]〛(ve) = ve0
+    {
+      ve0 = 〚o〛(ve);
+    }
+  }
+  function 〚Constant〛: #List<IToken># → #List<IToken>#
+  {
+    equation 〚Num[n]〛(ve) = ve0
+    {
+      #
+        ve.add(new IntToken(Integer.valueOf(n)));
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve.toString()); #}
+    equation 〚True〛(ve) = ve0
+    {
+      #
+        ve.add(new BoolToken(true));
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    equation 〚False〛(ve) = ve0
+    {
+      #
+        ve.add(new BoolToken(false));
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+  }
+  function 〚ArithmeticOperations〛: #List<IToken># → #List<IToken>#
+  {
+    equation 〚Add〛(ve) = ve0
+    {
+      #
+        ve.add(new AddToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve.toString()); #}
+    equation 〚Sub〛(ve) = ve0
+    {
+      #
+        ve.add(new SubToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve.toString()); #}
+    equation 〚Mul〛(ve) = ve0
+    {
+      #
+        ve.add(new MulToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve.toString()); #}
+    equation 〚Cmp〛(ve) = ve0
+    {
+      #
+        ve.add(new CmpToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve.toString()); #}
+  }
+  function 〚LogicalOperations〛: #List<IToken># → #List<IToken>#
+  {
+    equation 〚Not〛(ve) = ve0
+    {
+      #
+        ve.add(new NotToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    equation 〚And〛(ve) = ve0
+    {
+      #
+        ve.add(new AndToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    equation 〚IsNeg〛(ve) = ve0
+    {
+      #
+        ve.add(new IsNegToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    equation 〚IsPos〛(ve) = ve0
+    {
+      #
+        ve.add(new IsPosToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+  }
+  function 〚StackOperations〛: #List<IToken># → #List<IToken>#
+  {
+    equation 〚Clear〛(ve) = ve0
+    {
+      #
+        ve.add(new ClearToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    equation 〚Id〛(ve) = ve0
+    {
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    equation 〚Pop〛(ve) = ve0
+    {
+      #
+        ve.add(new PopToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    equation 〚Dup〛(ve) = ve0
+    {
+      #
+        ve.add(new DupToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    equation 〚Over〛(ve) = ve0
+    {
+      #
+        ve.add(new OverToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    equation 〚Swap〛(ve) = ve0
+    {
+      #
+        ve.add(new SwapToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    equation 〚Rotl〛(ve) = ve0
+    {
+      #
+        ve.add(new RotlToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+  }
+  function 〚FunctionOperations〛: #List<IToken># → #List<IToken>#
+  {
+    equation 〚Compose〛(ve) = ve0
+    {
+      #
+        ve.add(new ComposeToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    equation 〚Apply〛(ve) = ve0
+    {
+      #
+        ve.add(new ApplyToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    equation 〚ApplyOver〛(ve) = ve0
+    {
+      #
+        ve.add(new ApplyOverToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    equation 〚Quote[s]〛(ve) = ve0
+    {
+      ve0 = 〚s〛(ve);
+      #
+        ve.add(new QuotationToken(ve0));
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+  }
+  function 〚ConditionsOperation〛: #List<IToken># → #List<IToken>#
+  {
+    equation 〚Choose〛(ve) = ve0
+    {
+      #
+        ve.add(new ChooseToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    equation 〚While〛(ve) = ve0
+    {
+      #
+        ve.add(new WhileToken());
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+  }
+}
+// -------------------------------------------------------------------------
+// end of file
+// -------------------------------------------------------------------------

@@ -27,12 +27,17 @@ public class IsNegToken implements IFunctionToken {
     }
 
     @Override
+    public IFunctionToken clone() {
+        return new IsNegToken();
+    }
+
+    @Override
     public String toString() {
         return "ISNEG";
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new IsNegToken();
+    public String toJSON() {
+        return "\"ISNEG\"";
     }
 }

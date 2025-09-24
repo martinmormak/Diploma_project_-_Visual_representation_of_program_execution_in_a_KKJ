@@ -15,12 +15,17 @@ public class ClearToken implements IFunctionToken {
     }
 
     @Override
+    public IFunctionToken clone() {
+        return new ClearToken();
+    }
+
+    @Override
     public String toString() {
         return "CLEAR";
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new ClearToken();
+    public String toJSON() {
+        return "\"CLEAR\"";
     }
 }

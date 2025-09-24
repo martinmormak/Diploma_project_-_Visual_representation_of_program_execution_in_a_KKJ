@@ -26,12 +26,17 @@ public class NotToken implements IFunctionToken {
     }
 
     @Override
+    public IFunctionToken clone() {
+        return new NotToken();
+    }
+
+    @Override
     public String toString() {
         return "NOT";
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new NotToken();
+    public String toJSON() {
+        return "\"NOT\"";
     }
 }

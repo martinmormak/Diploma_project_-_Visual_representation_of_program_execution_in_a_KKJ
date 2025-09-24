@@ -14,7 +14,7 @@ class ChooseTokenTest {
 
     @Test
     void testStackSolvingValidTokens() {
-        List<IToken> tokens1 = new LinkedList<>(List.of(new BoolToken(true), new IntToken(7), new IntToken(2), new ChooseToken()));
+        List<IToken> tokens1 = new LinkedList<>(List.of(new BoolToken(true), new ChooseToken(List.of(new IntToken(7)), List.of(new IntToken(2)))));
         Stack<IToken> stack1 = new Stack<>();
         tokens1.removeFirst().stackSolving(stack1);
         assertEquals(1, stack1.size());
@@ -42,7 +42,7 @@ class ChooseTokenTest {
         assertEquals(7, ((IntToken) stack1.peek()).getValue());
 
 
-        List<IToken> tokens2 = new LinkedList<>(List.of(new BoolToken(false), new IntToken(7), new IntToken(2), new ChooseToken()));
+        List<IToken> tokens2 = new LinkedList<>(List.of(new BoolToken(false), new ChooseToken(List.of(new IntToken(7)), List.of(new IntToken(2)))));
         Stack<IToken> stack2 = new Stack<>();
         tokens2.removeFirst().stackSolving(stack2);
         assertEquals(1, stack2.size());
@@ -91,7 +91,7 @@ class ChooseTokenTest {
         List<IToken> finalTokens = tokens1;
         assertThrows(RuntimeException.class, () ->  finalTokens.removeFirst().stackSolving(stack1));*/
 
-        List<IToken> tokens2 = new LinkedList<>(List.of(new IntToken(1), new IntToken(2), new BoolToken(true), new ChooseToken()));
+        List<IToken> tokens2 = new LinkedList<>(List.of(new IntToken(1), new ChooseToken(List.of(new IntToken(2)), List.of(new BoolToken(true)))));
         Stack<IToken> stack2 = new Stack<>();
         tokens2.removeFirst().stackSolving(stack2);
         assertEquals(1, stack2.size());
@@ -113,26 +113,20 @@ class ChooseTokenTest {
 
     @Test
     void testStackSolvingWithInsufficientTokens() {
-        List<IToken> tokens1 = new LinkedList<>(List.of( new IntToken(2), new ChooseToken()));
+        List<IToken> tokens1 = new LinkedList<>(List.of(new ChooseToken(List.of(new IntToken(2)), List.of(new BoolToken(true)))));
         Stack<IToken> stack1 = new Stack<>();
         tokens1.removeFirst().stackSolving(stack1);
         Exception exception1 = assertThrows(RuntimeException.class, () -> tokens1.removeFirst().stackSolving(stack1));
         assertTrue(exception1.getMessage().contains("In stack must be >= 3 items and is 1"));
-
-        List<IToken> tokens2 = new LinkedList<>(List.of(new BoolToken(true), new ChooseToken()));
-        Stack<IToken> stack2 = new Stack<>();
-        tokens2.removeFirst().stackSolving(stack2);
-        Exception exception2 = assertThrows(RuntimeException.class, () -> tokens2.removeFirst().stackSolving(stack2));
-        assertTrue(exception2.getMessage().contains("In stack must be >= 3 items and is 1"));
     }
 
     @Test
     void testToStringOutput() {
-        List<IToken> tokens1 = new LinkedList<>(List.of(new BoolToken(true), new IntToken(1), new IntToken(2), new ChooseToken()));
+        List<IToken> tokens1 = new LinkedList<>(List.of(new BoolToken(true), new ChooseToken(List.of(new IntToken(1)), List.of(new IntToken(2)))));
         CombinationToken combinationToken1 = new CombinationToken(tokens1);
         assertEquals("TRUE 1 2 CHOOSE", combinationToken1.toString());
 
-        List<IToken> tokens2 = new LinkedList<>(List.of(new BoolToken(false), new IntToken(1), new IntToken(2), new ChooseToken()));
+        List<IToken> tokens2 = new LinkedList<>(List.of(new BoolToken(false), new ChooseToken(List.of(new IntToken(1)), List.of(new IntToken(2)))));
         CombinationToken combinationToken2 = new CombinationToken(tokens2);
         assertEquals("FALSE 1 2 CHOOSE", combinationToken2.toString());
     }

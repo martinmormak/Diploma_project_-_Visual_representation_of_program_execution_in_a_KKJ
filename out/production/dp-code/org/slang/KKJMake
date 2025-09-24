@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# JAVA
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+JAVA_OPTIONS=
+JAVA=$JAVA_HOME/bin/java
+JAVAC=$JAVA_HOME/bin/javac
+
+# ANTLR4: complete tool for compilation, not just the runtime binaries
+ANTLR4_JAR=/home/marti/DP/SLANG-1.0.2/lib/antlr4.jar
+ANTLR4="$JAVA -cp $ANTLR4_JAR org.antlr.v4.Tool"
+
+# SLANG
+SLANG=/home/marti/DP/SLANG-1.0.2/bin/SLANG
+
+# execute SLANG, ANTLR4, JAVAC
+$SLANG -d lang/kkj KKJ.txt
+$ANTLR4 lang/kkj/KKJ.g4
+$JAVAC $JAVA_OPTIONS -cp "$ANTLR4_JAR:." KKJMain.java

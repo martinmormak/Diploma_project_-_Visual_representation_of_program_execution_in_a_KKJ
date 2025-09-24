@@ -27,12 +27,17 @@ public class AndToken implements IFunctionToken {
     }
 
     @Override
+    public IFunctionToken clone() {
+        return new AndToken();
+    }
+
+    @Override
     public String toString() {
         return "AND";
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new AndToken();
+    public String toJSON() {
+        return "\"AND\"";
     }
 }

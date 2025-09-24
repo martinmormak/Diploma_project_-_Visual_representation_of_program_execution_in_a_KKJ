@@ -19,13 +19,18 @@ public class PopToken implements IFunctionToken {
     }
 
     @Override
+    public IFunctionToken clone() {
+        return new PopToken();
+    }
+
+    @Override
     public String toString() {
         return "POP";
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new PopToken();
+    public String toJSON() {
+        return "\"POP\"";
     }
 }
 

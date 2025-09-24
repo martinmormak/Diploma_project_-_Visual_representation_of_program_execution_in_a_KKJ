@@ -1,21 +1,30 @@
 
       package org.slang.lang.kkj;
       import java.util.*;
+
+      import org.core.tokens.arithmetic.*;
+      import org.core.tokens.condition.*;
+      import org.core.tokens.constant.*;
+      import org.core.tokens.functions.*;
+      import org.core.tokens.interfaces.*;
+      import org.core.tokens.logic.*;
+      import org.core.tokens.quotation.*;
+      import org.core.tokens.stack.*;
       import static org.slang.lang.kkj.KKJ.*;
     
 public final class FunctionOperations_foperation
 {
   public static interface _Operation
   {
-    public void apply(Env _1);
+    public void apply(List<IToken> _1);
   }
   public static interface _BeforeEffect
   {
-    public void apply(Env _1);
+    public void apply(List<IToken> _1);
   }
   public static interface _AfterEffect
   {
-    public void apply(Env _1);
+    public void apply(List<IToken> _1);
   }
   public static _Operation operation(FunctionOperations _phrase)
   {
@@ -33,7 +42,7 @@ public final class FunctionOperations_foperation
         {
         };
       }
-      case FunctionOperations.Applyover() ->
+      case FunctionOperations.ApplyOver() ->
       {
         return (_Operation)(var te) -> 
         {

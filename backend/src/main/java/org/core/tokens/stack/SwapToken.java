@@ -22,12 +22,17 @@ public class SwapToken implements IFunctionToken {
     }
 
     @Override
+    public IFunctionToken clone() {
+        return new SwapToken();
+    }
+
+    @Override
     public String toString() {
         return "SWAP";
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new SwapToken();
+    public String toJSON() {
+        return "\"SWAP\"";
     }
 }

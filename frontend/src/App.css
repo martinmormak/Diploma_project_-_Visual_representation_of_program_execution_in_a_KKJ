@@ -1,0 +1,43 @@
+body{
+    background-color: white;
+}
+
+.input-section, .output-section {
+    height: 44vh;
+    width: 98vw;
+    padding: 1.5em;
+    box-sizing: border-box;
+}
+
+.input-section {
+    background: #f9f9f9;
+}
+
+.output-section {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-top: 0.2em solid #444;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
+
+textarea {
+    flex: 1;
+    height: 25vh;
+    width: 90vw;
+    font-family: monospace;
+    font-size: 1.4em;
+    padding: 1.0em;
+    resize: none;
+}
+
+button {
+    margin-top: 0.5em;
+    padding: 1em;
+    font-size: 1em;
+    align-self: flex-start;
+}
+
+#output-box {
+    padding: 1em;
+}

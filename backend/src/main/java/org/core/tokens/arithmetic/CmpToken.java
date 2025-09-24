@@ -27,12 +27,17 @@ public class CmpToken implements IFunctionToken {
     }
 
     @Override
+    public IFunctionToken clone() {
+        return new CmpToken();
+    }
+
+    @Override
     public String toString() {
         return "CMP";
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new CmpToken();
+    public String toJSON() {
+        return "\"CMP\"";
     }
 }

@@ -27,12 +27,17 @@ public class MulToken implements IFunctionToken {
     }
 
     @Override
+    public IFunctionToken clone() {
+        return new MulToken();
+    }
+
+    @Override
     public String toString() {
         return "MUL";
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new MulToken();
+    public String toJSON() {
+        return "\"MUL\"";
     }
 }

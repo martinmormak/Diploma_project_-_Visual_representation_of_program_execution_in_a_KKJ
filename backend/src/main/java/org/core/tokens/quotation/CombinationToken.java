@@ -33,6 +33,15 @@ public class CombinationToken implements IFunctionToken {
     }
 
     @Override
+    public IToken clone() {
+        List<IToken> tokensClone = new LinkedList<>();
+        for (IToken token : tokens) {
+            tokensClone.add(token.clone());
+        }
+        return new CombinationToken(tokensClone);
+    }
+
+    @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         for(IToken token : tokens){
@@ -45,11 +54,14 @@ public class CombinationToken implements IFunctionToken {
     }
 
     @Override
-    public IToken clone() {
-        List<IToken> tokensClone = new LinkedList<>();
-        for (IToken token : tokens) {
-            tokensClone.add(token.clone());
+    public String toJSON() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for(IToken token : tokens){
+            stringBuilder.append(token).append(" ");
         }
-        return new CombinationToken(tokensClone);
+        if(!stringBuilder.isEmpty()){
+            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        }
+        return stringBuilder.toString();
     }
 }

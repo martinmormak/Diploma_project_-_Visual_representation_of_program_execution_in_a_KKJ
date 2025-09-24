@@ -40,6 +40,11 @@ public class ConditionToken implements IFunctionToken {
     }
 
     @Override
+    public IFunctionToken clone() {
+        return new ConditionToken(condition,trueBranch,falseBranch);
+    }
+
+    @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("CONDITION( ");
@@ -50,7 +55,12 @@ public class ConditionToken implements IFunctionToken {
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new ConditionToken(condition,trueBranch,falseBranch);
+    public String toJSON() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\"CONDITION(\" ");
+        stringBuilder.append(condition).append(", ");
+        stringBuilder.append(trueBranch).append(", ");
+        stringBuilder.append(falseBranch).append(" \")\"");
+        return stringBuilder.toString();
     }
 }

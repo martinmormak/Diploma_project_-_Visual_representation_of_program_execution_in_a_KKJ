@@ -1,13 +1,22 @@
 
       package org.slang.lang.kkj;
       import java.util.*;
+
+      import org.core.tokens.arithmetic.*;
+      import org.core.tokens.condition.*;
+      import org.core.tokens.constant.*;
+      import org.core.tokens.functions.*;
+      import org.core.tokens.interfaces.*;
+      import org.core.tokens.logic.*;
+      import org.core.tokens.quotation.*;
+      import org.core.tokens.stack.*;
       import static org.slang.lang.kkj.KKJ.*;
     
 public final class Program_
 {
   public static interface _Operation
   {
-    public Void apply();
+    public List<IToken> apply();
   }
   public static interface _BeforeEffect
   {
@@ -15,7 +24,7 @@ public final class Program_
   }
   public static interface _AfterEffect
   {
-    public void apply(Void _1);
+    public void apply(List<IToken> _1);
   }
   public static _Operation operation(Program _phrase)
   {
@@ -26,11 +35,11 @@ public final class Program_
         var _1 = Sequence_.operation(c);
         return (_Operation)() -> 
         {
-          Void none;
-          Env ve0 =  new Env() ;
-          Env ve1 = _1.apply(ve0);
-          none =  null; System.out.println("Result"); System.out.println("STACK : " + ve0.printStack());  System.out.println("STACK HISTORY : " + ve0.printStackHistory());  System.out.println("Result  = " + ve1.peek()) ;
-          return none;
+          List<IToken> tokens;
+          List<IToken> ve0 =  new LinkedList<>() ;
+          tokens = _1.apply(ve0);
+           System.out.println("TokensList : " + ve0.toString()); 
+          return tokens;
         };
       }
     }

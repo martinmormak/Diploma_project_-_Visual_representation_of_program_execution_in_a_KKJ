@@ -1,21 +1,30 @@
 
       package org.slang.lang.kkj;
       import java.util.*;
+
+      import org.core.tokens.arithmetic.*;
+      import org.core.tokens.condition.*;
+      import org.core.tokens.constant.*;
+      import org.core.tokens.functions.*;
+      import org.core.tokens.interfaces.*;
+      import org.core.tokens.logic.*;
+      import org.core.tokens.quotation.*;
+      import org.core.tokens.stack.*;
       import static org.slang.lang.kkj.KKJ.*;
     
 public final class ArithmeticOperations_
 {
   public static interface _Operation
   {
-    public Env apply(Env _1);
+    public List<IToken> apply(List<IToken> _1);
   }
   public static interface _BeforeEffect
   {
-    public void apply(Env _1);
+    public void apply(List<IToken> _1);
   }
   public static interface _AfterEffect
   {
-    public void apply(Env _1, Env _2);
+    public void apply(List<IToken> _1, List<IToken> _2);
   }
   public static _Operation operation(ArithmeticOperations _phrase)
   {
@@ -25,21 +34,12 @@ public final class ArithmeticOperations_
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           
-        Value v1 = ve.peek();
-        Value v2 = ve.peek();
-        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
-          ve.pop();
-          ve.pop();
-          Value v = new IntegerValue(ev2.getValue() + ev1.getValue());
-          ve.push(v);
-        } else {
-          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
-        }
+        ve.add(new AddToken());
       
           ve0 = ve;
-           System.out.println("Add"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); 
+           System.out.println("TokensList : " + ve.toString()); 
           return ve0;
         };
       }
@@ -47,21 +47,12 @@ public final class ArithmeticOperations_
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           
-        Value v1 = ve.peek();
-        Value v2 = ve.peek();
-        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
-          ve.pop();
-          ve.pop();
-          Value v = new IntegerValue(ev2.getValue() - ev1.getValue());
-          ve.push(v);
-        } else {
-          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
-        }
+        ve.add(new SubToken());
       
           ve0 = ve;
-           System.out.println("Sub"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); 
+           System.out.println("TokensList : " + ve.toString()); 
           return ve0;
         };
       }
@@ -69,21 +60,12 @@ public final class ArithmeticOperations_
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           
-        Value v1 = ve.peek();
-        Value v2 = ve.peek();
-        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
-          ve.pop();
-          ve.pop();
-          Value v = new IntegerValue(ev2.getValue() * ev1.getValue());
-          ve.push(v);
-        } else {
-          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
-        }
+        ve.add(new MulToken());
       
           ve0 = ve;
-           System.out.println("Mul"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); 
+           System.out.println("TokensList : " + ve.toString()); 
           return ve0;
         };
       }
@@ -91,29 +73,12 @@ public final class ArithmeticOperations_
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           
-        Value v1 = ve.peek();
-        Value v2 = ve.peek();
-        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
-          ve.pop();
-          ve.pop();
-          if(ev1.getValue() < ev2.getValue()){
-            Value lv = new IntegerValue(1);
-            ve.push(lv);
-          } else if(ev1.getValue() > ev2.getValue()){
-            Value mv = new IntegerValue(-1);
-            ve.push(mv);
-          } else {
-            Value mv = new IntegerValue(0);
-            ve.push(mv);
-          }
-        } else {
-          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
-        }
+        ve.add(new CmpToken());
       
           ve0 = ve;
-           System.out.println("Cmp"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); 
+           System.out.println("TokensList : " + ve.toString()); 
           return ve0;
         };
       }

@@ -10,34 +10,60 @@ import java.util.List;
 import java.util.Stack;
 
 public class WhileToken implements IFunctionToken {
+    private List<IToken> conditionBranch;
+    private List<IToken> loopBranch;
+
+    public WhileToken(List<IToken> conditionBranch, List<IToken> loopBranch) {
+        this.conditionBranch = conditionBranch;
+        this.loopBranch = loopBranch;
+    }
 
     @Override
     public List<IToken> stackSolving(Stack<IToken> stack) {
-        if(stack.size()>=2) {
-            List<IToken> trueBranch = new LinkedList<>(List.of(stack.pop()));
-            List<IToken> condition = new LinkedList<>(List.of(stack.pop()));
+        if(!stack.isEmpty()) {
             List<IToken> trueBranchClone = new LinkedList<>();
             List<IToken> conditionClone = new LinkedList<>();
-            for(IToken token : trueBranch) {
+            for(IToken token : loopBranch) {
                 trueBranchClone.add(token.clone());
             }
-            for(IToken token : condition) {
+            for(IToken token : conditionBranch) {
                 conditionClone.add(token.clone());
             }
-            trueBranch.addAll(List.of(new QuotationToken(conditionClone), new QuotationToken(trueBranchClone), new WhileToken()));
-            return List.of(new ConditionToken(new ArrayList<>(condition), new ArrayList<>(trueBranch), new ArrayList<>()));
+            loopBranch.add(new WhileToken(conditionClone, trueBranchClone));
+            return List.of(new ConditionToken(new ArrayList<>(loopBranch), new ArrayList<>(conditionBranch), new ArrayList<>()));
         } else {
-            throw new RuntimeException("In stack must be >= 2 items and is " + (stack.isEmpty() ? "empty" : stack.size()));
+            throw new RuntimeException("In stack must be >= 1 items and is empty");
         }
     }
 
     @Override
-    public String toString() {
-        return "WHILE";
+    public IFunctionToken clone() {
+        List<IToken> trueBranchClone = new LinkedList<>();
+        List<IToken> conditionClone = new LinkedList<>();
+        for(IToken token : loopBranch) {
+            trueBranchClone.add(token.clone());
+        }
+        for(IToken token : conditionBranch) {
+            conditionClone.add(token.clone());
+        }
+        return new WhileToken(trueBranchClone, conditionClone);
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new WhileToken();
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("WHILE( ");
+        stringBuilder.append(conditionBranch).append(", ");
+        stringBuilder.append(loopBranch).append(" )");
+        return stringBuilder.toString();
+    }
+
+    @Override
+    public String toJSON() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\"WHILE(\" ");
+        stringBuilder.append(conditionBranch).append(", ");
+        stringBuilder.append(loopBranch).append(" )");
+        return stringBuilder.toString();
     }
 }

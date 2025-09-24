@@ -24,12 +24,17 @@ public class RotlToken implements IFunctionToken {
     }
 
     @Override
+    public IFunctionToken clone() {
+        return new RotlToken();
+    }
+
+    @Override
     public String toString() {
         return "ROTL";
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new RotlToken();
+    public String toJSON() {
+        return "\"ROTL\"";
     }
 }

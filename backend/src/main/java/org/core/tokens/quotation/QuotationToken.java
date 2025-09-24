@@ -20,6 +20,15 @@ public class QuotationToken implements IToken {
     }
 
     @Override
+    public IToken clone() {
+        List<IToken> tokensClone = new LinkedList<>();
+        for (IToken token : tokens) {
+            tokensClone.add(token.clone());
+        }
+        return new QuotationToken(tokensClone);
+    }
+
+    @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{ ");
@@ -30,11 +39,12 @@ public class QuotationToken implements IToken {
     }
 
     @Override
-    public IToken clone() {
-        List<IToken> tokensClone = new LinkedList<>();
-        for (IToken token : tokens) {
-            tokensClone.add(token.clone());
+    public String toJSON() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\"{\" ");
+        for(IToken token : tokens){
+            stringBuilder.append(token).append(" ");
         }
-        return new QuotationToken(tokensClone);
+        return stringBuilder.append("\"}\"").toString();
     }
 }

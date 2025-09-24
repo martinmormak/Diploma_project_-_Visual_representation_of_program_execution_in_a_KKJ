@@ -31,6 +31,15 @@ public class CompositionToken implements IFunctionToken {
     }
 
     @Override
+    public IToken clone() {
+        List<IToken> tokensClone = new LinkedList<>();
+        for (IToken token : tokens) {
+            tokensClone.add(token.clone());
+        }
+        return new CompositionToken(tokensClone);
+    }
+
+    @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("( ");
@@ -41,11 +50,12 @@ public class CompositionToken implements IFunctionToken {
     }
 
     @Override
-    public IToken clone() {
-        List<IToken> tokensClone = new LinkedList<>();
-        for (IToken token : tokens) {
-            tokensClone.add(token.clone());
+    public String toJSON() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\"(\" ");
+        for(IToken token : tokens){
+            stringBuilder.append(token).append(" ");
         }
-        return new CompositionToken(tokensClone);
+        return stringBuilder.append("\")\"").toString();
     }
 }

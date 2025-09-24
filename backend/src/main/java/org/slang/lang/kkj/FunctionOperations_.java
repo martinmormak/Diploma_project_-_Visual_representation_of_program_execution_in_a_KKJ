@@ -1,21 +1,30 @@
 
       package org.slang.lang.kkj;
       import java.util.*;
+
+      import org.core.tokens.arithmetic.*;
+      import org.core.tokens.condition.*;
+      import org.core.tokens.constant.*;
+      import org.core.tokens.functions.*;
+      import org.core.tokens.interfaces.*;
+      import org.core.tokens.logic.*;
+      import org.core.tokens.quotation.*;
+      import org.core.tokens.stack.*;
       import static org.slang.lang.kkj.KKJ.*;
     
 public final class FunctionOperations_
 {
   public static interface _Operation
   {
-    public Env apply(Env _1);
+    public List<IToken> apply(List<IToken> _1);
   }
   public static interface _BeforeEffect
   {
-    public void apply(Env _1);
+    public void apply(List<IToken> _1);
   }
   public static interface _AfterEffect
   {
-    public void apply(Env _1, Env _2);
+    public void apply(List<IToken> _1, List<IToken> _2);
   }
   public static _Operation operation(FunctionOperations _phrase)
   {
@@ -25,11 +34,12 @@ public final class FunctionOperations_
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           
+        ve.add(new ComposeToken());
       
           ve0 = ve;
-           System.out.println("Compose"); System.out.println("STACK : " + ve0.printStack()); 
+           System.out.println("TokensList : " + ve0.toString()); 
           return ve0;
         };
       }
@@ -37,24 +47,25 @@ public final class FunctionOperations_
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           
+        ve.add(new ApplyToken());
       
           ve0 = ve;
-           System.out.println("Apply"); System.out.println("STACK : " + ve0.printStack()); 
+           System.out.println("TokensList : " + ve0.toString()); 
           return ve0;
         };
       }
-      case FunctionOperations.Applyover() ->
+      case FunctionOperations.ApplyOver() ->
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           
-        ve.pop();
+        ve.add(new ApplyOverToken());
       
           ve0 = ve;
-           System.out.println("Applyover"); System.out.println("STACK : " + ve0.printStack()); 
+           System.out.println("TokensList : " + ve0.toString()); 
           return ve0;
         };
       }
@@ -63,9 +74,14 @@ public final class FunctionOperations_
         var _1 = Sequence_.operation(s);
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
-          ve0 = _1.apply(ve);
-           System.out.println("Quote"); System.out.println("STACK : " + ve0.printStack()); 
+          List<IToken> ve0;
+          List<IToken> ve1 = new LinkedList<>();
+          ve0 = _1.apply(ve1);
+          
+        ve.add(new QuotationToken(ve0));
+      
+          ve0 = ve;
+           System.out.println("TokensList : " + ve0.toString()); 
           return ve0;
         };
       }

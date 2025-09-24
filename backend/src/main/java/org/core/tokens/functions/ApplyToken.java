@@ -29,12 +29,17 @@ public class ApplyToken implements IToken {
     }
 
     @Override
+    public IToken clone() {
+        return new ApplyToken();
+    }
+
+    @Override
     public String toString() {
         return "APPLY";
     }
 
     @Override
-    public IToken clone() {
-        return new ApplyToken();
+    public String toJSON() {
+        return "\"APPLY\"";
     }
 }

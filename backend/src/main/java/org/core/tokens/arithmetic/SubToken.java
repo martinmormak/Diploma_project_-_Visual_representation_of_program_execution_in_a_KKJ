@@ -27,12 +27,17 @@ public class SubToken implements IFunctionToken {
     }
 
     @Override
+    public IFunctionToken clone() {
+        return new SubToken();
+    }
+
+    @Override
     public String toString() {
         return "SUB";
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new SubToken();
+    public String toJSON() {
+        return "\"SUB\"";
     }
 }

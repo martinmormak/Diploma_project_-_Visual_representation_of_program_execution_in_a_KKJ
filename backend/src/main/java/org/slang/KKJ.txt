@@ -13,6 +13,15 @@ language KKJ
     {#
       package org.slang.lang.kkj;
       import java.util.*;
+
+      import org.core.tokens.arithmetic.*;
+      import org.core.tokens.condition.*;
+      import org.core.tokens.constant.*;
+      import org.core.tokens.functions.*;
+      import org.core.tokens.interfaces.*;
+      import org.core.tokens.logic.*;
+      import org.core.tokens.quotation.*;
+      import org.core.tokens.stack.*;
       import static org.slang.lang.kkj.KKJ.*;
     #}
   }
@@ -163,53 +172,16 @@ language KKJ
   // -----------------------------------------------------------------------
   code
   {#
-    public enum Type { Int }
-    public static class Env
-    {
-      private HashMap<String,Value> variables = new HashMap<>();
-      private List<Stack<Value>> stacks = new LinkedList<>();
-      public Env()
-      { super(); stacks.add(new Stack<>()); }
-      public void put(String key, Value value)
-      { variables.put(key.toString(), value); }
-      public Value get(String key)
-      { return variables.get(key.toString()); }
-      public String printVariables()
-      { return variables.toString(); }
-      public void push(Value value)
-      { stacks.getLast().push(value); }
-      public Value peek()
-      { if (!stacks.getLast().isEmpty()) { return stacks.getLast().peek(); } else { throw new IllegalStateException("Cannot peek from an empty stack."); } }
-      public Value pop()
-      { if (!stacks.getLast().isEmpty()) { return stacks.getLast().pop(); } else { throw new IllegalStateException("Cannot pop from an empty stack."); } }
-      public String printStack()
-      { return stacks.getLast().toString(); }
-      public  String printStackHistory()
-      { return stacks.toString(); }
-      public void newStack()
-      { stacks.add(new Stack<>()); }
-    }
-    public static class TypeError extends RuntimeException
-    { public TypeError(String msg) { super(msg); } }
-    public static void check(Boolean b, String msg)
-    { if (!b) throw new TypeError(msg); }
-    sealed interface Value permits IntegerValue, StringValue, BoolValue { Object getValue(); }
-    record IntegerValue(Integer value) implements Value
-    { @Override public Integer getValue() { return value; } @Override public String toString() { return String.valueOf(value); } }
-    record StringValue(String value) implements Value
-    { @Override public String getValue() { return value; } @Override public String toString() { return value; } }
-    record BoolValue(Boolean value) implements Value
-    { @Override public Boolean getValue() { return value; } @Override public String toString() { return String.valueOf(value); } }
   #}
   judgment ⊢ Program: program
   {
     inference ⊢ Prog[s]: program
     {
-      te: #Env# = #new Env()# ;
+      te: #List<IToken># = #new LinkedList<>()# ;
       te ⊢ s: sequence;
     }
   }
-  judgment #Env# ⊢ Sequence: sequence
+  judgment #List<IToken># ⊢ Sequence: sequence
   {
     inference te ⊢ Seq[s1,s2]: sequence
     {
@@ -241,7 +213,7 @@ language KKJ
       te ⊢ o: ooperation;
     }
   }
-  judgment #Env# ⊢ Constant: constatant
+  judgment #List<IToken># ⊢ Constant: constatant
   {
     inference te ⊢ Num[n]: constatant
     {
@@ -253,7 +225,7 @@ language KKJ
     {
     }
   }
-  judgment #Env# ⊢ ArithmeticOperations: aoperation
+  judgment #List<IToken># ⊢ ArithmeticOperations: aoperation
   {
     inference te ⊢ Add: aoperation
     {
@@ -268,7 +240,7 @@ language KKJ
     {
     }
   }
-  judgment #Env# ⊢ LogicalOperations: loperation
+  judgment #List<IToken># ⊢ LogicalOperations: loperation
   {
     inference te ⊢ Not: loperation
     {
@@ -283,7 +255,7 @@ language KKJ
     {
     }
   }
-  judgment #Env# ⊢ StackOperations: soperation
+  judgment #List<IToken># ⊢ StackOperations: soperation
   {
     inference te ⊢ Clear: soperation
     {
@@ -307,7 +279,7 @@ language KKJ
     {
     }
   }
-  judgment #Env# ⊢ FunctionOperations: foperation
+  judgment #List<IToken># ⊢ FunctionOperations: foperation
   {
     inference te ⊢ Compose: foperation
     {
@@ -323,7 +295,7 @@ language KKJ
       te ⊢ s: sequence;
     }
   }
-  judgment #Env# ⊢ ConditionsOperation: ooperation
+  judgment #List<IToken># ⊢ ConditionsOperation: ooperation
   {
     inference te ⊢ Choose: ooperation
     {
@@ -332,7 +304,7 @@ language KKJ
     {
     }
   }
-  
+
   // -----------------------------------------------------------------------
   // denotational semantics
   // -----------------------------------------------------------------------
@@ -341,16 +313,15 @@ language KKJ
     public static class Failure extends RuntimeException { }
     public static void check(Boolean b) { if (!b) throw new Failure(); }
   #}
-  function 〚Program〛: #Void#
+  function 〚Program〛: #List<IToken>#
   {
-    equation 〚Prog[c]〛 = none
+    equation 〚Prog[c]〛 = tokens
     {
-      ve0: #Env# = # new Env() #;
-      ve1 = 〚c〛(ve0);
-      none = # null; System.out.println("Result"); System.out.println("STACK : " + ve0.printStack());  System.out.println("STACK HISTORY : " + ve0.printStackHistory());  System.out.println("Result  = " + ve1.peek()) # ;
+      ve0: #List<IToken># = # new LinkedList<>() #;
+      tokens =〚c〛(ve0); # System.out.println("TokensList : " + ve0.toString()); #
     }
   }
-  function 〚Sequence〛: #Env# → #Env#
+  function 〚Sequence〛: #List<IToken># → #List<IToken>#
   {
     equation 〚Seq[s1,s2]〛(ve) = ve0
     {
@@ -382,289 +353,199 @@ language KKJ
       ve0 = 〚o〛(ve);
     }
   }
-  function 〚Constant〛: #Env# → #Env#
+  function 〚Constant〛: #List<IToken># → #List<IToken>#
   {
     equation 〚Num[n]〛(ve) = ve0
     {
       #
-        Value v = new IntegerValue(Integer.valueOf(n));
-        ve.push(v);
+        ve.add(new IntToken(Integer.valueOf(n)));
       #
       ve0 = ve;
     }
-    after  {# System.out.println("Num"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve.toString()); #}
     equation 〚True〛(ve) = ve0
     {
       #
-        Value v = new BoolValue(true);
-        ve.push(v);
+        ve.add(new BoolToken(true));
       #
       ve0 = ve;
     }
-    after  {# System.out.println("True"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
     equation 〚False〛(ve) = ve0
     {
       #
-        Value v = new BoolValue(false);
-        ve.push(v);
+        ve.add(new BoolToken(false));
       #
       ve0 = ve;
     }
-    after  {# System.out.println("False"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
   }
-  function 〚ArithmeticOperations〛: #Env# → #Env#
+  function 〚ArithmeticOperations〛: #List<IToken># → #List<IToken>#
   {
     equation 〚Add〛(ve) = ve0
     {
       #
-        Value v1 = ve.peek();
-        Value v2 = ve.peek();
-        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
-          ve.pop();
-          ve.pop();
-          Value v = new IntegerValue(ev2.getValue() + ev1.getValue());
-          ve.push(v);
-        } else {
-          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
-        }
+        ve.add(new AddToken());
       #
       ve0 = ve;
     }
-    after  {# System.out.println("Add"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve.toString()); #}
     equation 〚Sub〛(ve) = ve0
     {
       #
-        Value v1 = ve.peek();
-        Value v2 = ve.peek();
-        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
-          ve.pop();
-          ve.pop();
-          Value v = new IntegerValue(ev2.getValue() - ev1.getValue());
-          ve.push(v);
-        } else {
-          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
-        }
+        ve.add(new SubToken());
       #
       ve0 = ve;
     }
-    after  {# System.out.println("Sub"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve.toString()); #}
     equation 〚Mul〛(ve) = ve0
     {
       #
-        Value v1 = ve.peek();
-        Value v2 = ve.peek();
-        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
-          ve.pop();
-          ve.pop();
-          Value v = new IntegerValue(ev2.getValue() * ev1.getValue());
-          ve.push(v);
-        } else {
-          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
-        }
+        ve.add(new MulToken());
       #
       ve0 = ve;
     }
-    after  {# System.out.println("Mul"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve.toString()); #}
     equation 〚Cmp〛(ve) = ve0
     {
       #
-        Value v1 = ve.peek();
-        Value v2 = ve.peek();
-        if (v1 instanceof IntegerValue ev1 && v2 instanceof IntegerValue ev2) {
-          ve.pop();
-          ve.pop();
-          if(ev1.getValue() < ev2.getValue()){
-            Value lv = new IntegerValue(1);
-            ve.push(lv);
-          } else if(ev1.getValue() > ev2.getValue()){
-            Value mv = new IntegerValue(-1);
-            ve.push(mv);
-          } else {
-            Value mv = new IntegerValue(0);
-            ve.push(mv);
-          }
-        } else {
-          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
-        }
+        ve.add(new CmpToken());
       #
       ve0 = ve;
     }
-    after  {# System.out.println("Cmp"); System.out.println("VARIABLES : " + ve.printVariables()); System.out.println("STACK : " + ve.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve.toString()); #}
   }
-  function 〚LogicalOperations〛: #Env# → #Env#
+  function 〚LogicalOperations〛: #List<IToken># → #List<IToken>#
   {
     equation 〚Not〛(ve) = ve0
     {
       #
-        Value v0 = ve.peek();
-        if (v0 instanceof BoolValue bv0) {
-          ve.pop();
-          Value v = new BoolValue(!bv0.getValue());
-          ve.push(v);
-        } else {
-          throw new IllegalArgumentException("Both values must be BoolValue for logical operations.");
-        }
-      # 
+        ve.add(new NotToken());
+      #
       ve0 = ve;
     }
-    after  {# System.out.println("Not"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
     equation 〚And〛(ve) = ve0
     {
       #
-        Value v1 = ve.peek();
-        Value v2 = ve.peek();
-        if (v1 instanceof BoolValue bv1 && v2 instanceof BoolValue bv2) {
-          ve.pop();
-          ve.pop();
-          Value v = new BoolValue(bv2.getValue() && bv1.getValue());
-          ve.push(v);
-        } else {
-          throw new IllegalArgumentException("Both values must be BoolValue for logical operations.");
-        }
-      # 
+        ve.add(new AndToken());
+      #
       ve0 = ve;
     }
-    after  {# System.out.println("And"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
     equation 〚IsNeg〛(ve) = ve0
     {
       #
-        Value v = ve.peek();
-        if (v instanceof IntegerValue ev) {
-          ve.pop();
-          if(ev.getValue() < 0){
-            Value vt = new BoolValue(true);
-            ve.push(vt);
-          } else {
-            Value vf = new BoolValue(false);
-            ve.push(vf);
-          }
-        } else {
-          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
-        }
-      # 
+        ve.add(new IsNegToken());
+      #
       ve0 = ve;
     }
-    after  {# System.out.println("IsNeg"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
     equation 〚IsPos〛(ve) = ve0
     {
       #
-        Value v = ve.peek();
-        if (v instanceof IntegerValue ev) {
-          ve.pop();
-          if(ev.getValue() > 0){
-            Value vt = new BoolValue(true);
-            ve.push(vt);
-          } else {
-            Value vf = new BoolValue(false);
-            ve.push(vf);
-          }
-        } else {
-          throw new IllegalArgumentException("Both values must be IntegerValue for logical operations.");
-        }
-      # 
+        ve.add(new IsPosToken());
+      #
       ve0 = ve;
     }
-    after  {# System.out.println("IsPos"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
   }
-  function 〚StackOperations〛: #Env# → #Env#
+  function 〚StackOperations〛: #List<IToken># → #List<IToken>#
   {
     equation 〚Clear〛(ve) = ve0
     {
       #
-        ve.newStack();
+        ve.add(new ClearToken());
       #
       ve0 = ve;
     }
-    after  {# System.out.println("Clear"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
     equation 〚Id〛(ve) = ve0
     {
       ve0 = ve;
     }
-    after  {# System.out.println("Id"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
     equation 〚Pop〛(ve) = ve0
     {
       #
-        ve.pop();
+        ve.add(new PopToken());
       #
       ve0 = ve;
     }
-    after  {# System.out.println("Pop"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
     equation 〚Dup〛(ve) = ve0
     {
       #
-        Value v = ve.peek();
-        ve.push(v);
+        ve.add(new DupToken());
       #
       ve0 = ve;
     }
-    after  {# System.out.println("Dup"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
     equation 〚Over〛(ve) = ve0
     {
       #
-        Value v1 = ve.pop();
-        Value v2 = ve.peek();
-        ve.push(v1);
-        ve.push(v2);
+        ve.add(new OverToken());
       #
       ve0 = ve;
     }
-    after  {# System.out.println("Over"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
     equation 〚Swap〛(ve) = ve0
     {
       #
-        Value v1 = ve.pop();
-        Value v2 = ve.pop();
-        ve.push(v2);
-        ve.push(v1);
+        ve.add(new SwapToken());
       #
       ve0 = ve;
     }
-    after  {# System.out.println("Swap"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
     equation 〚Rotl〛(ve) = ve0
     {
       #
-        Value v1 = ve.pop();
-        Value v2 = ve.pop();
-        Value v3 = ve.pop();
-        ve.push(v2);
-        ve.push(v1);
-        ve.push(v3);
+        ve.add(new RotlToken());
       #
       ve0 = ve;
     }
-    after  {# System.out.println("Rotl"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
   }
-  function 〚FunctionOperations〛: #Env# → #Env#
+  function 〚FunctionOperations〛: #List<IToken># → #List<IToken>#
   {
     equation 〚Compose〛(ve) = ve0
     {
       #
+        ve.add(new ComposeToken());
       #
       ve0 = ve;
     }
-    after  {# System.out.println("Compose"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
     equation 〚Apply〛(ve) = ve0
     {
       #
+        ve.add(new ApplyToken());
       #
       ve0 = ve;
     }
-    after  {# System.out.println("Apply"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
     equation 〚ApplyOver〛(ve) = ve0
     {
       #
-        ve.pop();
+        ve.add(new ApplyOverToken());
       #
       ve0 = ve;
     }
-    after  {# System.out.println("ApplyOver"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
     equation 〚Quote[s]〛(ve) = ve0
     {
-      ve0 = 〚s〛(ve);
+      #
+          List<IToken> ve1 = new LinkedList<>();
+      #
+      ve0 = 〚s〛(ve1);
+      #
+        ve.add(new QuotationToken(ve0));
+      #
+      ve0 = ve;
     }
-    after  {# System.out.println("Quote"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
   }
-  function 〚ConditionsOperation〛: #Env# → #Env#
+  function 〚ConditionsOperation〛: #List<IToken># → #List<IToken>#
   {
     equation 〚Choose〛(ve) = ve0
     {
@@ -672,14 +553,14 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("Choose"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
     equation 〚While〛(ve) = ve0
     {
       #
       #
       ve0 = ve;
     }
-    after  {# System.out.println("While"); System.out.println("STACK : " + ve0.printStack()); #}
+    after  {# System.out.println("TokensList : " + ve0.toString()); #}
   }
 }
 // -------------------------------------------------------------------------

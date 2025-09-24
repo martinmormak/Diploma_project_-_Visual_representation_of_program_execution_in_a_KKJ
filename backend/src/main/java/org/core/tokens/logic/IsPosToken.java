@@ -27,12 +27,17 @@ public class IsPosToken implements IFunctionToken {
     }
 
     @Override
+    public IFunctionToken clone() {
+        return new IsPosToken();
+    }
+
+    @Override
     public String toString() {
         return "ISPOS";
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new IsPosToken();
+    public String toJSON() {
+        return "\"ISPOS\"";
     }
 }

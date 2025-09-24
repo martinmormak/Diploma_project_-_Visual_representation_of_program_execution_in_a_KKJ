@@ -29,12 +29,17 @@ public class ComposeToken implements IToken {
     }
 
     @Override
+    public IToken clone() {
+        return new ComposeToken();
+    }
+
+    @Override
     public String toString() {
         return "COMPOSE";
     }
 
     @Override
-    public IToken clone() {
-        return new ComposeToken();
+    public String toJSON() {
+        return "\"COMPOSE\"";
     }
 }

@@ -27,12 +27,17 @@ public class AddToken implements IFunctionToken {
     }
 
     @Override
+    public IFunctionToken clone() {
+        return new AddToken();
+    }
+
+    @Override
     public String toString() {
         return "ADD";
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new AddToken();
+    public String toJSON() {
+        return "\"ADD\"";
     }
 }

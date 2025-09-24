@@ -53,12 +53,17 @@ public class BoolToken implements ILogicToken {
     }
 
     @Override
+    public ILogicToken clone() {
+        return new BoolToken(value);
+    }
+
+    @Override
     public String toString() {
         return value.toString().toUpperCase();
     }
 
     @Override
-    public ILogicToken clone() {
-        return new BoolToken(value);
+    public String toJSON() {
+        return "\"" + value.toString().toUpperCase() + "\"";
     }
 }

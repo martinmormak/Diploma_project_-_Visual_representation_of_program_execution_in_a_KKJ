@@ -1,21 +1,30 @@
 
       package org.slang.lang.kkj;
       import java.util.*;
+
+      import org.core.tokens.arithmetic.*;
+      import org.core.tokens.condition.*;
+      import org.core.tokens.constant.*;
+      import org.core.tokens.functions.*;
+      import org.core.tokens.interfaces.*;
+      import org.core.tokens.logic.*;
+      import org.core.tokens.quotation.*;
+      import org.core.tokens.stack.*;
       import static org.slang.lang.kkj.KKJ.*;
     
 public final class ConditionsOperation_
 {
   public static interface _Operation
   {
-    public Env apply(Env _1);
+    public List<IToken> apply(List<IToken> _1);
   }
   public static interface _BeforeEffect
   {
-    public void apply(Env _1);
+    public void apply(List<IToken> _1);
   }
   public static interface _AfterEffect
   {
-    public void apply(Env _1, Env _2);
+    public void apply(List<IToken> _1, List<IToken> _2);
   }
   public static _Operation operation(ConditionsOperation _phrase)
   {
@@ -25,11 +34,12 @@ public final class ConditionsOperation_
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           
+        ve.add(new ChooseToken());
       
           ve0 = ve;
-           System.out.println("Choose"); System.out.println("STACK : " + ve0.printStack()); 
+           System.out.println("TokensList : " + ve0.toString()); 
           return ve0;
         };
       }
@@ -37,11 +47,12 @@ public final class ConditionsOperation_
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           
+        ve.add(new WhileToken());
       
           ve0 = ve;
-           System.out.println("While"); System.out.println("STACK : " + ve0.printStack()); 
+           System.out.println("TokensList : " + ve0.toString()); 
           return ve0;
         };
       }

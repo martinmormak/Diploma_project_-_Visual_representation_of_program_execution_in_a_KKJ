@@ -19,12 +19,17 @@ public class DupToken implements IFunctionToken {
     }
 
     @Override
+    public IFunctionToken clone() {
+        return new DupToken();
+    }
+
+    @Override
     public String toString() {
         return "DUP";
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new DupToken();
+    public String toJSON() {
+        return "\"DUP\"";
     }
 }

@@ -6,4 +6,6 @@ import java.util.Stack;
 public interface IToken {
     List<IToken> stackSolving(Stack<IToken> stack);
     IToken clone();
+    String toString();
+    String toJSON();
 }

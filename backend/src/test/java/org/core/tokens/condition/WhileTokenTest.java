@@ -16,7 +16,7 @@ class WhileTokenTest {
 
     @Test
     void testStackSolvingValidTokens() {
-        /*List<IToken> tokens1 = new LinkedList<>(List.of(new BoolToken(true), new IntToken(7), new WhileToken()));
+        List<IToken> tokens1 = new LinkedList<>(List.of(new WhileToken(List.of(new BoolToken(true)), List.of(new IntToken(7)))));
         Stack<IToken> stack1 = new Stack<>();
         tokens1.removeFirst().stackSolving(stack1);
         IToken iToken1 = tokens1.removeFirst().stackSolving(stack1).removeFirst();
@@ -34,7 +34,7 @@ class WhileTokenTest {
         assertEquals(7, ((IntToken) stack1.peek()).getValue());
 
 
-        List<IToken> tokens2 = new LinkedList<>(List.of(new BoolToken(false), new IntToken(7), new WhileToken()));
+        List<IToken> tokens2 = new LinkedList<>(List.of(new WhileToken(List.of(new BoolToken(false)), List.of(new IntToken(7)))));
         Stack<IToken> stack2 = new Stack<>();
         IToken iToken2 = tokens2.removeFirst().stackSolving(stack2).removeFirst();
         assertInstanceOf(ChooseToken.class, iToken2);
@@ -44,7 +44,7 @@ class WhileTokenTest {
         assertInstanceOf(BoolToken.class, stack1.peek());
         assertEquals(false, ((BoolToken) stack2.peek()).getValue());
         iToken2.stackSolving(stack2);
-        assertEquals(0, stack2.size());*/
+        assertEquals(0, stack2.size());
     }
 
     @Test
@@ -73,26 +73,21 @@ class WhileTokenTest {
 
     @Test
     void testStackSolvingWithInsufficientTokens() {
-        List<IToken> tokens1 = new LinkedList<>(List.of( new IntToken(2), new WhileToken()));
+        List<IToken> tokens1 = new LinkedList<>(List.of(new WhileToken(List.of( new IntToken(2)), List.of(new IntToken(5)))));
         Stack<IToken> stack1 = new Stack<>();
         tokens1.removeFirst().stackSolving(stack1);
+        tokens1.removeFirst().stackSolving(stack1);
         Exception exception1 = assertThrows(RuntimeException.class, () -> tokens1.removeFirst().stackSolving(stack1));
-        assertTrue(exception1.getMessage().contains("In stack must be >= 2 items and is 1"));
-
-        List<IToken> tokens2 = new LinkedList<>(List.of(new BoolToken(true), new WhileToken()));
-        Stack<IToken> stack2 = new Stack<>();
-        tokens2.removeFirst().stackSolving(stack2);
-        Exception exception2 = assertThrows(RuntimeException.class, () -> tokens2.removeFirst().stackSolving(stack2));
-        assertTrue(exception2.getMessage().contains("In stack must be >= 2 items and is 1"));
+        assertTrue(exception1.getMessage().contains("In stack must be >= 1 items and is 1"));
     }
 
     @Test
     void testToStringOutput() {
-        List<IToken> tokens1 = new LinkedList<>(List.of(new BoolToken(true), new IntToken(1), new IntToken(2), new WhileToken()));
+        List<IToken> tokens1 = new LinkedList<>(List.of(new WhileToken(List.of(new BoolToken(true)), List.of(new IntToken(1), new IntToken(2)))));
         CombinationToken combinationToken1 = new CombinationToken(tokens1);
         assertEquals("TRUE 1 2 WHILE", combinationToken1.toString());
 
-        List<IToken> tokens2 = new LinkedList<>(List.of(new BoolToken(false), new IntToken(1), new IntToken(2), new WhileToken()));
+        List<IToken> tokens2 = new LinkedList<>(List.of(new WhileToken(List.of(new BoolToken(false)), List.of(new IntToken(1), new IntToken(2)))));
         CombinationToken combinationToken2 = new CombinationToken(tokens2);
         assertEquals("FALSE 1 2 WHILE", combinationToken2.toString());
     }

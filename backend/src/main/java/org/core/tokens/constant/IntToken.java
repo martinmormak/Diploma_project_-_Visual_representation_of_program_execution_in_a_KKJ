@@ -37,12 +37,17 @@ public class IntToken implements IArithmeticToken {
     }
 
     @Override
+    public IArithmeticToken clone() {
+        return new IntToken(value);
+    }
+
+    @Override
     public String toString() {
         return value.toString();
     }
 
     @Override
-    public IArithmeticToken clone() {
-        return new IntToken(value);
+    public String toJSON() {
+        return value.toString();
     }
 }

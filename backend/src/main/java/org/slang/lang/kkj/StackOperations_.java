@@ -1,21 +1,30 @@
 
       package org.slang.lang.kkj;
       import java.util.*;
+
+      import org.core.tokens.arithmetic.*;
+      import org.core.tokens.condition.*;
+      import org.core.tokens.constant.*;
+      import org.core.tokens.functions.*;
+      import org.core.tokens.interfaces.*;
+      import org.core.tokens.logic.*;
+      import org.core.tokens.quotation.*;
+      import org.core.tokens.stack.*;
       import static org.slang.lang.kkj.KKJ.*;
     
 public final class StackOperations_
 {
   public static interface _Operation
   {
-    public Env apply(Env _1);
+    public List<IToken> apply(List<IToken> _1);
   }
   public static interface _BeforeEffect
   {
-    public void apply(Env _1);
+    public void apply(List<IToken> _1);
   }
   public static interface _AfterEffect
   {
-    public void apply(Env _1, Env _2);
+    public void apply(List<IToken> _1, List<IToken> _2);
   }
   public static _Operation operation(StackOperations _phrase)
   {
@@ -25,12 +34,12 @@ public final class StackOperations_
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           
-        ve.newStack();
+        ve.add(new ClearToken());
       
           ve0 = ve;
-           System.out.println("Clear"); System.out.println("STACK : " + ve0.printStack()); 
+           System.out.println("TokensList : " + ve0.toString()); 
           return ve0;
         };
       }
@@ -38,9 +47,9 @@ public final class StackOperations_
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           ve0 = ve;
-           System.out.println("Id"); System.out.println("STACK : " + ve0.printStack()); 
+           System.out.println("TokensList : " + ve0.toString()); 
           return ve0;
         };
       }
@@ -48,12 +57,12 @@ public final class StackOperations_
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           
-        ve.pop();
+        ve.add(new PopToken());
       
           ve0 = ve;
-           System.out.println("Pop"); System.out.println("STACK : " + ve0.printStack()); 
+           System.out.println("TokensList : " + ve0.toString()); 
           return ve0;
         };
       }
@@ -61,13 +70,12 @@ public final class StackOperations_
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           
-        Value v = ve.peek();
-        ve.push(v);
+        ve.add(new DupToken());
       
           ve0 = ve;
-           System.out.println("Dup"); System.out.println("STACK : " + ve0.printStack()); 
+           System.out.println("TokensList : " + ve0.toString()); 
           return ve0;
         };
       }
@@ -75,15 +83,12 @@ public final class StackOperations_
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           
-        Value v1 = ve.pop();
-        Value v2 = ve.peek();
-        ve.push(v1);
-        ve.push(v2);
+        ve.add(new OverToken());
       
           ve0 = ve;
-           System.out.println("Over"); System.out.println("STACK : " + ve0.printStack()); 
+           System.out.println("TokensList : " + ve0.toString()); 
           return ve0;
         };
       }
@@ -91,15 +96,12 @@ public final class StackOperations_
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           
-        Value v1 = ve.pop();
-        Value v2 = ve.pop();
-        ve.push(v2);
-        ve.push(v1);
+        ve.add(new SwapToken());
       
           ve0 = ve;
-           System.out.println("Swap"); System.out.println("STACK : " + ve0.printStack()); 
+           System.out.println("TokensList : " + ve0.toString()); 
           return ve0;
         };
       }
@@ -107,17 +109,12 @@ public final class StackOperations_
       {
         return (_Operation)(var ve) -> 
         {
-          Env ve0;
+          List<IToken> ve0;
           
-        Value v1 = ve.pop();
-        Value v2 = ve.pop();
-        Value v3 = ve.pop();
-        ve.push(v2);
-        ve.push(v1);
-        ve.push(v3);
+        ve.add(new RotlToken());
       
           ve0 = ve;
-           System.out.println("Rotl"); System.out.println("STACK : " + ve0.printStack()); 
+           System.out.println("TokensList : " + ve0.toString()); 
           return ve0;
         };
       }

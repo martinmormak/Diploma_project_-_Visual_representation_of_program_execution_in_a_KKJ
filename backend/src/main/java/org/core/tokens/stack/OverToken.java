@@ -22,12 +22,17 @@ public class OverToken implements IFunctionToken {
     }
 
     @Override
+    public IFunctionToken clone() {
+        return new OverToken();
+    }
+
+    @Override
     public String toString() {
         return "OVER";
     }
 
     @Override
-    public IFunctionToken clone() {
-        return new OverToken();
+    public String toJSON() {
+        return "\"OVER\"";
     }
 }
