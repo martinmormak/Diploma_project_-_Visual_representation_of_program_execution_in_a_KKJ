@@ -75,7 +75,9 @@ public final class FunctionOperations_
         return (_Operation)(var ve) -> 
         {
           List<IToken> ve0;
-          List<IToken> ve1 = new LinkedList<>();
+          
+        List<IToken> ve1 = new LinkedList<>();
+      
           ve0 = _1.apply(ve1);
           
         ve.add(new QuotationToken(ve0));

@@ -38,7 +38,7 @@ language KKJ
     LogicalOperations = Not + And + IsNeg + IsPos;
     StackOperations = Clear + Id + Pop + Dup + Over + Swap + Rotl;
     FunctionOperations = Compose + Apply + ApplyOver + Quote[Sequence];
-    ConditionsOperation = Choose + While;
+    ConditionsOperation = Choose[Sequence,Sequence,Sequence] + While;
   }
 
   // -----------------------------------------------------------------------
@@ -99,11 +99,11 @@ language KKJ
     }
     domain ConditionsOperation
     {
-      case Choose → # _result = "IF"; #;
+      case Choose[s1,s2,s3] → # _result = "(" + s1 + ") CHOOSE (" + s2 + ") (" + s3 + ")"; #;
       case While → # _result = "WHILE"; #;
     }
   }
-  
+
   // -----------------------------------------------------------------------
   // parser
   // -----------------------------------------------------------------------
@@ -162,11 +162,11 @@ language KKJ
     }
     domain ConditionsOperation
     {
-      case # 'IF'# → Choose;
+      case # '( ' + s1=dSequence  + ' ) CHOOSE ( ' + s2=dSequence  + ' ) ( ' + s3=dSequence  + ' )'# → Choose[s1,s2,s3];
       case # 'WHILE' # → While;
     }
   }
-  
+
   // -----------------------------------------------------------------------
   // type system
   // -----------------------------------------------------------------------
@@ -297,8 +297,11 @@ language KKJ
   }
   judgment #List<IToken># ⊢ ConditionsOperation: ooperation
   {
-    inference te ⊢ Choose: ooperation
+    inference te ⊢ Choose[s1,s2,s3]: ooperation
     {
+      te ⊢ s1: sequence;
+      te ⊢ s2: sequence;
+      te ⊢ s3: sequence;
     }
     inference te ⊢ While: ooperation
     {
@@ -534,7 +537,13 @@ language KKJ
     after  {# System.out.println("TokensList : " + ve0.toString()); #}
     equation 〚Quote[s]〛(ve) = ve0
     {
+      #
+        List<IToken> ve1 = new LinkedList<>();
+        //TODO: ve rewrite to ve1
+      #
+
       ve0 = 〚s〛(ve);
+
       #
         ve.add(new QuotationToken(ve0));
       #
@@ -544,10 +553,21 @@ language KKJ
   }
   function 〚ConditionsOperation〛: #List<IToken># → #List<IToken>#
   {
-    equation 〚Choose〛(ve) = ve0
+    equation 〚Choose[s1,s2,s3]〛(ve) = ve0
     {
       #
-        ve.add(new ChooseToken());
+        List<IToken> ve3 = new LinkedList<>();
+        List<IToken> ve4 = new LinkedList<>();
+        List<IToken> ve5 = new LinkedList<>();
+        //TODO: ve rewrite to ve3 and ve4 and ve5
+      #
+
+      ve2 = 〚s1〛(ve);
+      ve1 = 〚s2〛(ve);
+      ve0 = 〚s3〛(ve);
+
+      #
+        ve.add(new ConditionToken(ve2,ve1,ve0));
       #
       ve0 = ve;
     }
@@ -555,7 +575,6 @@ language KKJ
     equation 〚While〛(ve) = ve0
     {
       #
-        ve.add(new WhileToken());
       #
       ve0 = ve;
     }

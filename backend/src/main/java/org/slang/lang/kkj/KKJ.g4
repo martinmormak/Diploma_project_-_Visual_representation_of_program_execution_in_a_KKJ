@@ -62,7 +62,7 @@ dFunctionOperations returns [ FunctionOperations _result ] :
 |  '{ ' + s=dSequence  + ' }'{ $_result = new FunctionOperations.Quote($s._result); }
 ;
 dConditionsOperation returns [ ConditionsOperation _result ] :
-   'IF'{ $_result = new ConditionsOperation.Choose(); }
+   '( ' + s1=dSequence  + ' ) CHOOSE ( ' + s2=dSequence  + ' ) ( ' + s3=dSequence  + ' )'{ $_result = new ConditionsOperation.Choose($s1._result, $s2._result, $s3._result); }
 |  'WHILE' { $_result = new ConditionsOperation.While(); }
 ;
 dNUM returns [ String _result ] : n=NUM { $_result = $n.text; } ;

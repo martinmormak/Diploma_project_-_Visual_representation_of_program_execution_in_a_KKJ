@@ -15,12 +15,15 @@
 public sealed interface ConditionsOperation permits
 ConditionsOperation.Choose, ConditionsOperation.While
 {
-  public record Choose() implements ConditionsOperation
+  public record Choose(Sequence _1, Sequence _2, Sequence _3) implements ConditionsOperation
   {
     public String toString()
     {
+      var s1 = _1;
+      var s2 = _2;
+      var s3 = _3;
       String _result;
-       _result = "IF"; 
+       _result = "(" + s1 + ") CHOOSE (" + s2 + ") (" + s3 + ")"; 
       return _result;
     }
   }
