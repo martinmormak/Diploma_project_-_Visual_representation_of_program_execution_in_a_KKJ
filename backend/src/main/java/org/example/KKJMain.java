@@ -1,5 +1,6 @@
-package org;
+package org.example;
 
+import org.StringProcessor;
 import org.slang.lang.kkj.*;
 import org.core.Tokenizer;
 import org.core.tokens.interfaces.IToken;
@@ -7,10 +8,6 @@ import org.core.tokens.interfaces.IToken;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class KKJMain {
     private static final ConfigReader configReader = new ConfigReader();
@@ -35,20 +32,26 @@ public class KKJMain {
         // Apply toUpperCase replacements
         text = text.toUpperCase();
 
+        List<IToken> tokens;
+
         System.out.println("After to upper case replacing: " + text);
 
-        List<IToken> tokens = new LinkedList<>();
-
         if (configReader.getToggleState("slangEnabled")) {
+
             Program program = KKJ_parser.parseProgram(text);
+
             System.out.println(program);
+
             Program_program.operation(program).apply();
+
             tokens = Program_.operation(program).apply();
-            System.out.println("TOKENS: " + tokens);
         } else {
             Tokenizer tokenizer = new Tokenizer();
             tokens = tokenizer.getTokenList(text);
         }
+
+        System.out.println("TOKENS: " + tokens);
+
         if (configReader.getToggleState("termRewritingEnabled")) {
                 /*for (IToken token : tokens) {
                     while (!termRewritingIsSolved(token)) {

@@ -99,7 +99,7 @@ language KKJ
     }
     domain ConditionsOperation
     {
-      case Choose[s1,s2,s3] → # _result = "(" + s1 + ") CHOOSE (" + s2 + ") (" + s3 + ")"; #;
+      case Choose[s1,s2,s3] → # _result = "(" + s1 + ") CHOOSE (" + s2 + ") (" + s3 + ")"; #; //TODO: try add option for condition without parentheses
       case While → # _result = "WHILE"; #;
     }
   }
