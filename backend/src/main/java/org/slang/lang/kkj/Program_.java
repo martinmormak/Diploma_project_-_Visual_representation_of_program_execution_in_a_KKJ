@@ -38,7 +38,7 @@ public final class Program_
           List<IToken> tokens;
           List<IToken> ve0 =  new LinkedList<>() ;
           tokens = _1.apply(ve0);
-           System.out.println("TokensList : " + ve0.toString()); 
+           System.out.println("TokensList: " + ve0.toString());
           return tokens;
         };
       }

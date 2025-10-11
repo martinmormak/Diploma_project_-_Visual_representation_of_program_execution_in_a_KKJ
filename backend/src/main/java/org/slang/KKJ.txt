@@ -321,7 +321,7 @@ language KKJ
     equation 〚Prog[c]〛 = tokens
     {
       ve0: #List<IToken># = # new LinkedList<>() #;
-      tokens =〚c〛(ve0); # System.out.println("TokensList : " + ve0.toString()); #
+      tokens =〚c〛(ve0); # System.out.println("TokensList: " + ve0.toString()); #
     }
   }
   function 〚Sequence〛: #List<IToken># → #List<IToken>#
@@ -365,7 +365,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve.toString()); #}
+    after  {# System.out.println("TokensList: " + ve.toString()); #}
     equation 〚True〛(ve) = ve0
     {
       #
@@ -373,7 +373,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
     equation 〚False〛(ve) = ve0
     {
       #
@@ -381,7 +381,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
   }
   function 〚ArithmeticOperations〛: #List<IToken># → #List<IToken>#
   {
@@ -392,7 +392,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve.toString()); #}
+    after  {# System.out.println("TokensList: " + ve.toString()); #}
     equation 〚Sub〛(ve) = ve0
     {
       #
@@ -400,7 +400,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve.toString()); #}
+    after  {# System.out.println("TokensList: " + ve.toString()); #}
     equation 〚Mul〛(ve) = ve0
     {
       #
@@ -408,7 +408,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve.toString()); #}
+    after  {# System.out.println("TokensList: " + ve.toString()); #}
     equation 〚Cmp〛(ve) = ve0
     {
       #
@@ -416,7 +416,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve.toString()); #}
+    after  {# System.out.println("TokensList: " + ve.toString()); #}
   }
   function 〚LogicalOperations〛: #List<IToken># → #List<IToken>#
   {
@@ -427,7 +427,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
     equation 〚And〛(ve) = ve0
     {
       #
@@ -435,7 +435,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
     equation 〚IsNeg〛(ve) = ve0
     {
       #
@@ -443,7 +443,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
     equation 〚IsPos〛(ve) = ve0
     {
       #
@@ -451,7 +451,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
   }
   function 〚StackOperations〛: #List<IToken># → #List<IToken>#
   {
@@ -462,12 +462,12 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
     equation 〚Id〛(ve) = ve0
     {
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
     equation 〚Pop〛(ve) = ve0
     {
       #
@@ -475,7 +475,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
     equation 〚Dup〛(ve) = ve0
     {
       #
@@ -483,7 +483,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
     equation 〚Over〛(ve) = ve0
     {
       #
@@ -491,7 +491,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
     equation 〚Swap〛(ve) = ve0
     {
       #
@@ -499,7 +499,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
     equation 〚Rotl〛(ve) = ve0
     {
       #
@@ -507,7 +507,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
   }
   function 〚FunctionOperations〛: #List<IToken># → #List<IToken>#
   {
@@ -518,7 +518,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
     equation 〚Apply〛(ve) = ve0
     {
       #
@@ -526,7 +526,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
     equation 〚ApplyOver〛(ve) = ve0
     {
       #
@@ -534,7 +534,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
     equation 〚Quote[s]〛(ve) = ve0
     {
       #
@@ -549,7 +549,7 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
   }
   function 〚ConditionsOperation〛: #List<IToken># → #List<IToken>#
   {
@@ -571,14 +571,14 @@ language KKJ
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
     equation 〚While〛(ve) = ve0
     {
       #
       #
       ve0 = ve;
     }
-    after  {# System.out.println("TokensList : " + ve0.toString()); #}
+    after  {# System.out.println("TokensList: " + ve0.toString()); #}
   }
 }
 // -------------------------------------------------------------------------

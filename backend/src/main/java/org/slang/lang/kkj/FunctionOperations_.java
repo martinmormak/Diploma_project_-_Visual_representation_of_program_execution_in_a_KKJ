@@ -39,7 +39,7 @@ public final class FunctionOperations_
         ve.add(new ComposeToken());
       
           ve0 = ve;
-           System.out.println("TokensList : " + ve0.toString()); 
+           System.out.println("TokensList: " + ve0.toString());
           return ve0;
         };
       }
@@ -52,7 +52,7 @@ public final class FunctionOperations_
         ve.add(new ApplyToken());
       
           ve0 = ve;
-           System.out.println("TokensList : " + ve0.toString()); 
+           System.out.println("TokensList: " + ve0.toString());
           return ve0;
         };
       }
@@ -65,7 +65,7 @@ public final class FunctionOperations_
         ve.add(new ApplyOverToken());
       
           ve0 = ve;
-           System.out.println("TokensList : " + ve0.toString()); 
+           System.out.println("TokensList: " + ve0.toString());
           return ve0;
         };
       }
@@ -83,7 +83,7 @@ public final class FunctionOperations_
         ve.add(new QuotationToken(ve0));
       
           ve0 = ve;
-           System.out.println("TokensList : " + ve0.toString()); 
+           System.out.println("TokensList: " + ve0.toString());
           return ve0;
         };
       }

@@ -39,7 +39,7 @@ public final class Constant_
         ve.add(new IntToken(Integer.valueOf(n)));
       
           ve0 = ve;
-           System.out.println("TokensList : " + ve.toString()); 
+           System.out.println("TokensList: " + ve.toString());
           return ve0;
         };
       }
@@ -52,7 +52,7 @@ public final class Constant_
         ve.add(new BoolToken(true));
       
           ve0 = ve;
-           System.out.println("TokensList : " + ve0.toString()); 
+           System.out.println("TokensList: " + ve0.toString());
           return ve0;
         };
       }
@@ -65,7 +65,7 @@ public final class Constant_
         ve.add(new BoolToken(false));
       
           ve0 = ve;
-           System.out.println("TokensList : " + ve0.toString()); 
+           System.out.println("TokensList: " + ve0.toString());
           return ve0;
         };
       }

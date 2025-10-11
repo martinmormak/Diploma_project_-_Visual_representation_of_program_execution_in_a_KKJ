@@ -50,7 +50,7 @@ public final class ConditionsOperation_
         ve.add(new ConditionToken(ve2,ve1,ve0));
       
           ve0 = ve;
-           System.out.println("TokensList : " + ve0.toString()); 
+           System.out.println("TokensList: " + ve0.toString());
           return ve0;
         };
       }
@@ -62,7 +62,7 @@ public final class ConditionsOperation_
           
       
           ve0 = ve;
-           System.out.println("TokensList : " + ve0.toString()); 
+           System.out.println("TokensList: " + ve0.toString());
           return ve0;
         };
       }
