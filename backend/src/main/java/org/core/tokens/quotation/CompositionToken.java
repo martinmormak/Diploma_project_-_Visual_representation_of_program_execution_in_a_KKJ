@@ -25,7 +25,10 @@ public class CompositionToken implements IFunctionToken {
             if (result != null && !result.isEmpty()) {
                 tokens.addAll(0, result);
             }
-            return List.of(this);
+            if(!tokens.isEmpty()) {
+                return List.of(this);
+            }
+            //return List.of(this);
         }
         return null;
     }

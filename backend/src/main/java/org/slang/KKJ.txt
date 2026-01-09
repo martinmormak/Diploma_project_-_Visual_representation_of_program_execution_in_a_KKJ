@@ -38,7 +38,7 @@ language KKJ
     LogicalOperations = Not + And + IsNeg + IsPos;
     StackOperations = Clear + Id + Pop + Dup + Over + Swap + Rotl;
     FunctionOperations = Compose + Apply + ApplyOver + Quote[Sequence];
-    ConditionsOperation = Choose[Sequence,Sequence,Sequence] + While;
+    ConditionsOperation = Choose + While;
   }
 
   // -----------------------------------------------------------------------
@@ -99,7 +99,7 @@ language KKJ
     }
     domain ConditionsOperation
     {
-      case Choose[s1,s2,s3] → # _result = "(" + s1 + ") CHOOSE (" + s2 + ") (" + s3 + ")"; #; //TODO: try add option for condition without parentheses
+      case Choose → # _result = "CHOOSE"; #;
       case While → # _result = "WHILE"; #;
     }
   }
@@ -162,7 +162,7 @@ language KKJ
     }
     domain ConditionsOperation
     {
-      case # '( ' + s1=dSequence  + ' ) CHOOSE ( ' + s2=dSequence  + ' ) ( ' + s3=dSequence  + ' )'# → Choose[s1,s2,s3];
+      case # 'CHOOSE'# → Choose;
       case # 'WHILE' # → While;
     }
   }
@@ -297,11 +297,8 @@ language KKJ
   }
   judgment #List<IToken># ⊢ ConditionsOperation: ooperation
   {
-    inference te ⊢ Choose[s1,s2,s3]: ooperation
+    inference te ⊢ Choose: ooperation
     {
-      te ⊢ s1: sequence;
-      te ⊢ s2: sequence;
-      te ⊢ s3: sequence;
     }
     inference te ⊢ While: ooperation
     {
@@ -553,21 +550,9 @@ language KKJ
   }
   function 〚ConditionsOperation〛: #List<IToken># → #List<IToken>#
   {
-    equation 〚Choose[s1,s2,s3]〛(ve) = ve0
+    equation 〚Choose〛(ve) = ve0
     {
       #
-        List<IToken> ve3 = new LinkedList<>();
-        List<IToken> ve4 = new LinkedList<>();
-        List<IToken> ve5 = new LinkedList<>();
-        //TODO: ve rewrite to ve3 and ve4 and ve5
-      #
-
-      ve2 = 〚s1〛(ve);
-      ve1 = 〚s2〛(ve);
-      ve0 = 〚s3〛(ve);
-
-      #
-        ve.add(new ConditionToken(ve2,ve1,ve0));
       #
       ve0 = ve;
     }
