@@ -30,16 +30,10 @@ public final class ConditionsOperation_ooperation
   {
     switch (_phrase)
     {
-      case ConditionsOperation.Choose(var s1, var s2, var s3) ->
+      case ConditionsOperation.Choose() ->
       {
-        var _1 = Sequence_sequence.operation(s1);
-        var _2 = Sequence_sequence.operation(s2);
-        var _3 = Sequence_sequence.operation(s3);
         return (_Operation)(var te) -> 
         {
-          _1.apply(te);
-          _2.apply(te);
-          _3.apply(te);
         };
       }
       case ConditionsOperation.While() ->

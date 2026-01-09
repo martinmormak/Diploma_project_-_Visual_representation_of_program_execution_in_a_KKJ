@@ -39,7 +39,7 @@ public final class ArithmeticOperations_
         ve.add(new AddToken());
       
           ve0 = ve;
-           System.out.println("TokensList: " + ve.toString());
+           System.out.println("TokensList: " + ve.toString()); 
           return ve0;
         };
       }
@@ -52,7 +52,7 @@ public final class ArithmeticOperations_
         ve.add(new SubToken());
       
           ve0 = ve;
-           System.out.println("TokensList: " + ve.toString());
+           System.out.println("TokensList: " + ve.toString()); 
           return ve0;
         };
       }
@@ -65,7 +65,7 @@ public final class ArithmeticOperations_
         ve.add(new MulToken());
       
           ve0 = ve;
-           System.out.println("TokensList: " + ve.toString());
+           System.out.println("TokensList: " + ve.toString()); 
           return ve0;
         };
       }
@@ -78,7 +78,7 @@ public final class ArithmeticOperations_
         ve.add(new CmpToken());
       
           ve0 = ve;
-           System.out.println("TokensList: " + ve.toString());
+           System.out.println("TokensList: " + ve.toString()); 
           return ve0;
         };
       }

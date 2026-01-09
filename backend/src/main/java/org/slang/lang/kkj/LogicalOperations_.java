@@ -39,7 +39,7 @@ public final class LogicalOperations_
         ve.add(new NotToken());
       
           ve0 = ve;
-           System.out.println("TokensList: " + ve0.toString());
+           System.out.println("TokensList: " + ve0.toString()); 
           return ve0;
         };
       }
@@ -52,7 +52,7 @@ public final class LogicalOperations_
         ve.add(new AndToken());
       
           ve0 = ve;
-           System.out.println("TokensList: " + ve0.toString());
+           System.out.println("TokensList: " + ve0.toString()); 
           return ve0;
         };
       }
@@ -65,7 +65,7 @@ public final class LogicalOperations_
         ve.add(new IsNegToken());
       
           ve0 = ve;
-           System.out.println("TokensList: " + ve0.toString());
+           System.out.println("TokensList: " + ve0.toString()); 
           return ve0;
         };
       }
@@ -78,7 +78,7 @@ public final class LogicalOperations_
         ve.add(new IsPosToken());
       
           ve0 = ve;
-           System.out.println("TokensList: " + ve0.toString());
+           System.out.println("TokensList: " + ve0.toString()); 
           return ve0;
         };
       }

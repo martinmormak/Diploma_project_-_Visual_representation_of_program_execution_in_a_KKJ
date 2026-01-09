@@ -39,7 +39,7 @@ public final class StackOperations_
         ve.add(new ClearToken());
       
           ve0 = ve;
-           System.out.println("TokensList: " + ve0.toString());
+           System.out.println("TokensList: " + ve0.toString()); 
           return ve0;
         };
       }
@@ -49,7 +49,7 @@ public final class StackOperations_
         {
           List<IToken> ve0;
           ve0 = ve;
-           System.out.println("TokensList: " + ve0.toString());
+           System.out.println("TokensList: " + ve0.toString()); 
           return ve0;
         };
       }
@@ -62,7 +62,7 @@ public final class StackOperations_
         ve.add(new PopToken());
       
           ve0 = ve;
-           System.out.println("TokensList: " + ve0.toString());
+           System.out.println("TokensList: " + ve0.toString()); 
           return ve0;
         };
       }
@@ -75,7 +75,7 @@ public final class StackOperations_
         ve.add(new DupToken());
       
           ve0 = ve;
-           System.out.println("TokensList: " + ve0.toString());
+           System.out.println("TokensList: " + ve0.toString()); 
           return ve0;
         };
       }
@@ -88,7 +88,7 @@ public final class StackOperations_
         ve.add(new OverToken());
       
           ve0 = ve;
-           System.out.println("TokensList: " + ve0.toString());
+           System.out.println("TokensList: " + ve0.toString()); 
           return ve0;
         };
       }
@@ -101,7 +101,7 @@ public final class StackOperations_
         ve.add(new SwapToken());
       
           ve0 = ve;
-           System.out.println("TokensList: " + ve0.toString());
+           System.out.println("TokensList: " + ve0.toString()); 
           return ve0;
         };
       }
@@ -114,7 +114,7 @@ public final class StackOperations_
         ve.add(new RotlToken());
       
           ve0 = ve;
-           System.out.println("TokensList: " + ve0.toString());
+           System.out.println("TokensList: " + ve0.toString()); 
           return ve0;
         };
       }
