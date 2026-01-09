@@ -54,6 +54,12 @@ public class StringProcessor {
                 text = matcher.replaceAll(value);
             }
 
+            // Give spaces after/before quotations
+            text = text.replaceAll("\\{", "{ ").trim();
+            text = text.replaceAll("\\}", " }").trim();
+            text = text.replaceAll("\\(", "( ").trim();
+            text = text.replaceAll("\\)", " )").trim();
+
             // Remove extra spaces
             text = text.replaceAll(" {2}", " ").trim();
 

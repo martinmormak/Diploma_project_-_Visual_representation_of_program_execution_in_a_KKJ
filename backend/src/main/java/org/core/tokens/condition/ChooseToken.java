@@ -1,34 +1,45 @@
 package org.core.tokens.condition;
 
+import org.core.tokens.constant.BoolToken;
 import org.core.tokens.interfaces.IFunctionToken;
 import org.core.tokens.interfaces.IToken;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
 public class ChooseToken implements IFunctionToken {
-    private final List<IToken> trueBranch;
-    private final List<IToken> falseBranch;
 
-    public ChooseToken(List<IToken> trueBranch, List<IToken> falseBranch) {
-        this.trueBranch = trueBranch;
-        this.falseBranch = falseBranch;
+    public ChooseToken() {
     }
 
     @Override
     public List<IToken> stackSolving(Stack<IToken> stack) {
-        if(!stack.isEmpty()) {
-            List<IToken> condition = new LinkedList<>(List.of(stack.pop()));
-            return new LinkedList<>(List.of(new ConditionToken(condition, trueBranch, falseBranch)));
+        if(stack.size()>=3) {
+            IToken falseBranch = stack.pop();
+            IToken trueBranch = stack.pop();
+            IToken condition = stack.pop();
+
+            if(condition instanceof BoolToken) {
+                if (((BoolToken) condition).getValue() == true) {
+                    stack.push(trueBranch);
+                    return new ArrayList<>();
+                } else {
+                    stack.push(falseBranch);
+                    return new ArrayList<>();
+                }
+            } else {
+                throw new RuntimeException("Condition must be BoolToken and is " + condition.getClass());
+            }
         } else {
-            throw new RuntimeException("In stack must be >= 1 items and is empty");
+            throw new RuntimeException("In stack must be >= 3 items and is empty");
         }
     }
 
     @Override
     public IFunctionToken clone() {
-        return new ChooseToken(trueBranch, falseBranch);
+        return new ChooseToken();
     }
 
     @Override

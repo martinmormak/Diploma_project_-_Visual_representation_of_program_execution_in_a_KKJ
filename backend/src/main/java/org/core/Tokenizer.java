@@ -88,10 +88,10 @@ public class Tokenizer {
                 IToken iToken = new ApplyOverToken();
                 tokenList.add(iToken);
             } else if(token.toUpperCase().matches("CHOOSE")) {
-                IToken iToken = new ChooseToken(null,null);
+                IToken iToken = new ChooseToken();
                 tokenList.add(iToken);
             } else if (token.toUpperCase().matches("WHILE")) {
-                IToken iToken = new WhileToken(null,null);
+                IToken iToken = new WhileToken();
                 tokenList.add(iToken);
             } else if (token.equals("{")) {
                 programs.add(tokenList);

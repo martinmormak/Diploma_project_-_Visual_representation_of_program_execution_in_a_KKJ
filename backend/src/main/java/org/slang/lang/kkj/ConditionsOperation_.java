@@ -36,6 +36,7 @@ public final class ConditionsOperation_
         {
           List<IToken> ve0;
           
+        ve.add(new ChooseToken());
       
           ve0 = ve;
            System.out.println("TokensList: " + ve0.toString()); 
@@ -48,6 +49,7 @@ public final class ConditionsOperation_
         {
           List<IToken> ve0;
           
+        ve.add(new WhileToken());
       
           ve0 = ve;
            System.out.println("TokensList: " + ve0.toString()); 

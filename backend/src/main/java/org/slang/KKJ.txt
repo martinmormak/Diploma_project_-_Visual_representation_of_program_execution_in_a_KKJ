@@ -553,6 +553,7 @@ language KKJ
     equation 〚Choose〛(ve) = ve0
     {
       #
+        ve.add(new ChooseToken());
       #
       ve0 = ve;
     }
@@ -560,6 +561,7 @@ language KKJ
     equation 〚While〛(ve) = ve0
     {
       #
+        ve.add(new WhileToken());
       #
       ve0 = ve;
     }
