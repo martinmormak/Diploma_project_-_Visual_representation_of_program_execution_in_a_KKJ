@@ -36,7 +36,7 @@ public class WhileToken implements IFunctionToken {
                     new QuotationToken(branchClone),
                     new WhileToken()
             );
-            return List.of(new ConditionToken(condition, loopBranch, new ArrayList<>()));
+            return List.of(new ConditionToken(condition, loopBranch, List.of(new IDToken())));
         } else {
             throw new RuntimeException("In stack must be >= 2 items and is empty");
         }
