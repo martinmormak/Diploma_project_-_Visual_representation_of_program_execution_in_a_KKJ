@@ -7,13 +7,34 @@ function App() {
     const [output, setOutput] = useState([]);
     const [visibleLines, setVisibleLines] = useState(0);
 
+    const examples = [
+        {
+            label: "— Select an example —",
+            value: ""
+        },
+        {
+            label: "Example 1: Simple program",
+            value: "5 3 ADD"
+        },
+        {
+            label: "Example 2: Stack ops",
+            value: "10 DUP MUL"
+        },
+        {
+            label: "Example 3: Invalid program",
+            value: "1 ADD"
+        }
+    ];
+
     async function handleInputChange(event) {
         setProgram(event.target.value);
     }
 
-    async function validateProgram() {
-        const outputBox = document.getElementById("output-box");
+    async function handleExampleChange(event) {
+        setProgram(event.target.value);
+    }
 
+    async function validateProgram() {
         try {
             const response = await fetch(
                 URL+`/api/v1/validate/${encodeURIComponent(program)}`,
@@ -26,9 +47,7 @@ function App() {
                 }
             );
 
-            console.log(response);
-            console.log(response.ok);
-            if (response.ok == true) {
+            if (response.ok === true) {
                 await runProgram();
             } else {
                 setOutput([{ tokens: ["ERROR"], stack: ["validateProgram(): Network response was not ok."] }]);
@@ -47,13 +66,14 @@ function App() {
                 { method: "GET" }
             );
 
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
+            if (response.ok) {
+                const data = await response.json();
+                setOutput(data);
+                setVisibleLines(1);
+            } else {
+                setOutput([{ tokens: ["ERROR"], stack: ["Network response was not ok"] }]);
+                setVisibleLines(1);
             }
-
-            const data = await response.json();
-            setOutput(data);
-            setVisibleLines(1);
         } catch (error) {
             setOutput([{ tokens: ["ERROR"], stack: [error.message] }]);
             setVisibleLines(1);
@@ -88,6 +108,16 @@ function App() {
             <div className="body">
                 <h1>KKJ validator</h1>
                 <div className="input-section">
+                    <select
+                        onChange={handleExampleChange}
+                        value={program}
+                    >
+                        {examples.map((ex, index) => (
+                            <option key={index} value={ex.value}>
+                                {ex.label}
+                            </option>
+                        ))}
+                    </select>
                     <textarea
                         id="user-input"
                         placeholder="Write your program here..."

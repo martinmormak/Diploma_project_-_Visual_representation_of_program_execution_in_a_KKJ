@@ -19,10 +19,17 @@ body {
     white-space: pre-wrap;
 }
 
+select {
+    width: 30vw;
+    padding: 1vh 1vw;
+    font-size: 1em;
+    margin-bottom: 1vh;
+}
+
 textarea {
     margin-bottom: 2vh;
     flex: 1;
-    height: 25vh;
+    height: 20vh;
     width: 89vw;
     font-family: monospace;
     font-size: 1.4em;
