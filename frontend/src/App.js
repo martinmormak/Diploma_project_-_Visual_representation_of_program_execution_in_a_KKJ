@@ -49,8 +49,7 @@ function App() {
             );
 
             if (response.ok) {
-                const responseText = await response.text();
-                outputBox.innerText = responseText;
+                outputBox.innerText = await response.text();
             } else {
                 outputBox.innerText = "runProgram(): Network response was not ok.";
             }
@@ -74,8 +73,19 @@ function App() {
                 </div>
 
                 <div className="output-section">
-                    <h3>Output:</h3>
-                    <div id="output-box"></div>
+                    <div className="output-secreen">
+                        <h3>Output:</h3>
+                        <div id="output-box"></div>
+                    </div>
+                    <div className="output-buttons">
+                        <div className="top-buttons">
+                            <button>Previous</button>
+                            <button>Next</button>
+                        </div>
+                        <div className="bottom-button">
+                            <button>Show all</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
