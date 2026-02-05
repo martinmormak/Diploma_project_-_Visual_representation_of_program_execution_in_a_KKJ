@@ -36,12 +36,48 @@ button {
     align-self: flex-start;
 }
 
-.output-secreen {
+.output-screen {
     margin-bottom: 2vh;
     padding: 2vh 2vw;
     background: #1e1e1e;
     width: 89vw;
     height: 25vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+.output-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: monospace;
+    color: #d4d4d4;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.output-table th,
+.output-table td {
+    border: 1px solid #444;
+    padding: 0.6em;
+    vertical-align: top;
+}
+
+.output-table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #2d2d2d;
+    box-shadow: 0 2px 0 #444;
+}
+
+.output-table tr:nth-child(even) {
+    background: #252526;
 }
 
 #output-box {
@@ -69,7 +105,7 @@ button {
         gap: 0.1vw;
     }
 
-    .output-secreen {
+    .output-screen {
         height: 38vh;
         margin-bottom: 0;
     }
