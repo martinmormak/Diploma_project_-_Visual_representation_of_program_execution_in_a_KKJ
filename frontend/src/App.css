@@ -50,6 +50,7 @@ button {
     flex: 1;
     overflow-y: auto;
     overflow-x: auto;
+    scrollbar-gutter: stable;
 }
 
 .output-table {
@@ -57,7 +58,6 @@ button {
     border-collapse: collapse;
     font-family: monospace;
     color: #d4d4d4;
-    border-collapse: collapse;
     table-layout: fixed;
 }
 
@@ -95,6 +95,53 @@ button {
 .top-buttons, .bottom-button {
     display: flex;
     gap: 0.5em;
+}
+
+::-webkit-scrollbar {
+    width: 0.5vw;
+    height: 0.5vh;
+}
+
+::-webkit-scrollbar-track {
+    background: #1e1e1e;
+    border-radius: 1em;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #555555;
+    border-radius: 1em;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #777777;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #555555 #1e1e1e;
+}
+
+.App * {
+    scrollbar-width: thin;
+    scrollbar-color: #555555 #1e1e1e;
+}
+
+.App ::-webkit-scrollbar {
+    width: 0.5vw;
+    height: 0.5vh;
+}
+
+.App ::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+.App ::-webkit-scrollbar-thumb {
+    background: #555555;
+    border-radius: 1em;
+}
+
+.App ::-webkit-scrollbar-thumb:hover {
+    background: #777777;
 }
 
 @media (min-width: 800px) {
