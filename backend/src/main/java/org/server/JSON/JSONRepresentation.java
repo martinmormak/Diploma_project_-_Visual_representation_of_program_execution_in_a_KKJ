@@ -20,8 +20,11 @@ public class JSONRepresentation {
         this.stack = new Stack<>();
     }
 
-    public JSONRepresentation(List<IToken> tokens, Stack<IToken> stack) {
+    public JSONRepresentation(List<IToken> newTokens, List<IToken> tokens, Stack<IToken> stack) {
         this.tokens = new LinkedList<>();
+        for (IToken token : newTokens) {
+            this.tokens.add(token.clone());
+        }
         for (IToken token : tokens) {
             this.tokens.add(token.clone());
         }

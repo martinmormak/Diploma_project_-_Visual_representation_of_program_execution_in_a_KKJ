@@ -82,19 +82,37 @@ public class KKJController {
             Stack<IToken> stack = new Stack<>();
             while (!tokens.isEmpty()) {
                 IToken token = tokens.removeFirst();
-                token.stackSolving(stack);
+                List<IToken> newTokens = new LinkedList<>();
+                while (token != null) {
+                    List<IToken> returnTokens = token.stackSolving(stack);
 
-                jsonRepresentationList.add(new JSONRepresentation(tokens, stack));
+                    if (returnTokens != null && !returnTokens.isEmpty()) {
+                        newTokens.addAll(0, returnTokens);
+                    }
+                    if (!newTokens.isEmpty() && newTokens.getLast() == null) {
+                        newTokens.removeLast();
+                    }
 
-                for (IToken iToken : tokens) {
-                    System.out.print(iToken + " ");
+                    jsonRepresentationList.add(new JSONRepresentation(newTokens, tokens, stack));
+
+                    for (IToken iToken : newTokens) {
+                        System.out.print(iToken + " ");
+                    }
+                    for (IToken iToken : tokens) {
+                        System.out.print(iToken + " ");
+                    }
+
+                    System.out.print("\t|\t");
+                    for (IToken iToken : stack) {
+                        System.out.print(iToken + " ");
+                    }
+                    System.out.println();
+                    if(!newTokens.isEmpty()) {
+                        token = newTokens.removeFirst();
+                    } else {
+                        token = null;
+                    }
                 }
-
-                System.out.print("\t|\t");
-                for (IToken iToken : stack) {
-                    System.out.print(iToken + " ");
-                }
-                System.out.println();
             }
             System.out.println("------------------------------\n");
         } catch (Exception e) {
