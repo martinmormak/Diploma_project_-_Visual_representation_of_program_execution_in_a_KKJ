@@ -1,11 +1,12 @@
 import './App.css';
-import {useState} from "react";
+import {useState, useRef} from "react";
 
 function App() {
-    const URL = window.location.origin.split(':3000')[0] + ':8083';
+    const backendURL = window.location.origin.split(':3000')[0] + ':8083';
     const [program, setProgram] = useState('');
     const [output, setOutput] = useState([]);
     const [visibleLines, setVisibleLines] = useState(0);
+    const fileInputRef = useRef(null);
 
     const examples = [
         {
@@ -34,10 +35,60 @@ function App() {
         setProgram(event.target.value);
     }
 
+    function saveToFile() {
+        const element = document.createElement("a");
+        const file = new Blob([program], {
+            type: "text/plain"
+        });
+        element.href = URL.createObjectURL(file);
+        element.download = "kkjProgram.txt";
+        document.body.appendChild(element);
+        element.click();
+    }
+
+    function loadFromFile(event) {const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            setProgram(e.target.result);
+        };
+        reader.readAsText(file);
+
+        // allow loading the same file again
+        event.target.value = null;
+    }
+
+    function exportTableToFile() {
+        const csv = [
+            ["Tokens", "Stack"], // header row
+            ...output.map((row, rowIndex) => [
+                row.tokens.join(" "),
+                row.stack
+                    .map(value => `[s${rowIndex}] ${value}`)
+                    .join(" | ")
+            ])
+        ]
+            .map(row =>
+                row.map(value => `"${value.replace(/"/g, '""')}"`).join(",")
+            )
+            .join("\n");
+
+        const element = document.createElement("a");
+        const file = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+
+        element.href = URL.createObjectURL(file);
+        element.download = "kkjTable.csv";
+
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
     async function validateProgram() {
         try {
             const response = await fetch(
-                URL+`/api/v1/validate/${encodeURIComponent(program)}`,
+                backendURL+`/api/v1/validate/${encodeURIComponent(program)}`,
                 {
                     method: "POST",
                     headers: {
@@ -62,7 +113,7 @@ function App() {
     async function runProgram() {
         try {
             const response = await fetch(
-                URL + `/api/v1/simulate/${encodeURIComponent(program)}`,
+                backendURL + `/api/v1/simulate/${encodeURIComponent(program)}`,
                 { method: "GET" }
             );
 
@@ -92,12 +143,25 @@ function App() {
                 </tr>
                 </thead>
                 <tbody>
-                {rows.map((row, index) => (
+                {rows.map((row, index) => {
+                    const isError = row.tokens.includes("ERROR");
+
+                    return (
                     <tr key={index}>
-                        <td>{row.tokens.join(" ")}</td>
-                        <td>{row.stack.join(" ")}</td>
+                        <td>
+                            <pre>
+                                {row.tokens.join(" ")}
+                            </pre>
+                        </td>
+                        <td>
+                            <pre>
+                                {isError
+                                    ? row.stack.join("\n")
+                                    : row.stack.map((v) => `[s${index}] ${v}`).join("\n")}
+                            </pre>
+                        </td>
                     </tr>
-                ))}
+                    )})}
                 </tbody>
             </table>
         );
@@ -124,7 +188,18 @@ function App() {
                         value={program}
                         onChange={handleInputChange}
                     ></textarea>
-                    <button onClick={validateProgram}>Run</button>
+                    <div className="input-buttons">
+                        <button onClick={validateProgram}>Run</button>
+                        <button onClick={saveToFile}>Save to file</button>
+                        <button onClick={() => fileInputRef.current.click()}>Load from file</button>
+                    </div>
+                    <input
+                        type="file"
+                        accept=".txt"
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
+                        onChange={loadFromFile}
+                    />
                 </div>
 
                 <div className="output-section">
@@ -164,6 +239,7 @@ function App() {
                             >
                                 Show all
                             </button>
+                            <button onClick={exportTableToFile}>Export table</button>
                         </div>
                     </div>
                 </div>
