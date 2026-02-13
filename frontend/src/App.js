@@ -2,7 +2,7 @@ import './App.css';
 import {useState, useRef} from "react";
 
 function App() {
-    const backendURL = window.location.origin.split(':3000')[0] + ':8083';
+    const backendURL = process.env.REACT_APP_BACKEND_URL;
     const [program, setProgram] = useState('');
     const [output, setOutput] = useState([]);
     const [visibleLines, setVisibleLines] = useState(0);
