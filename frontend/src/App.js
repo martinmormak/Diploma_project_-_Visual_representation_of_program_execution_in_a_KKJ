@@ -190,8 +190,8 @@ function App() {
                     ></textarea>
                     <div className="input-buttons">
                         <button onClick={validateProgram}>Run</button>
-                        <button onClick={saveToFile}>Save to file</button>
-                        <button onClick={() => fileInputRef.current.click()}>Load from file</button>
+                        <button onClick={saveToFile}>Save program to file</button>
+                        <button onClick={() => fileInputRef.current.click()}>Load program from file</button>
                     </div>
                     <input
                         type="file"

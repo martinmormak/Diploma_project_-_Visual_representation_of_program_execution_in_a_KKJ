@@ -30,7 +30,7 @@ public class ChooseToken implements IFunctionToken {
                     return new ArrayList<>();
                 }
             } else {
-                throw new RuntimeException("Condition must be BoolToken and is " + condition.getClass());
+                throw new RuntimeException("Condition must be BoolToken and is " + condition.getClass().getSimpleName());
             }
         } else {
             throw new RuntimeException("In stack must be >= 3 items and is empty");
