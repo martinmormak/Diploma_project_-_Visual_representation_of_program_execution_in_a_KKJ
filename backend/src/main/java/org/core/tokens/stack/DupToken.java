@@ -30,6 +30,6 @@ public class DupToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"DUP\"";
+        return "DUP";
     }
 }

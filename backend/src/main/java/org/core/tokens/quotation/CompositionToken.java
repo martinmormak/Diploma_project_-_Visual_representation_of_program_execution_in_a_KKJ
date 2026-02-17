@@ -26,7 +26,7 @@ public class CompositionToken implements IFunctionToken {
                 tokens.addAll(0, result);
             }
             if(!tokens.isEmpty()) {
-                return List.of(this);
+                return new LinkedList<>(List.of(this));
             }
             //return List.of(this);
         }
@@ -55,10 +55,10 @@ public class CompositionToken implements IFunctionToken {
     @Override
     public String toJSON() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\"(\" ");
+        stringBuilder.append("( ");
         for(IToken token : tokens){
-            stringBuilder.append(token).append(" ");
+            stringBuilder.append(token.toJSON()).append(" ");
         }
-        return stringBuilder.append("\")\"").toString();
+        return stringBuilder.append(")").toString();
     }
 }

@@ -5,6 +5,8 @@ import org.core.tokens.arithmetic.CmpToken;
 import org.core.tokens.arithmetic.MulToken;
 import org.core.tokens.arithmetic.SubToken;
 import org.core.tokens.condition.ChooseToken;
+import org.core.tokens.condition.ConditionToken;
+import org.core.tokens.condition.IDToken;
 import org.core.tokens.condition.WhileToken;
 import org.core.tokens.constant.BoolToken;
 import org.core.tokens.constant.IntToken;
@@ -16,18 +18,37 @@ import org.core.tokens.logic.AndToken;
 import org.core.tokens.logic.IsNegToken;
 import org.core.tokens.logic.IsPosToken;
 import org.core.tokens.logic.NotToken;
+import org.core.tokens.quotation.CombinationToken;
 import org.core.tokens.quotation.QuotationToken;
 import org.core.tokens.stack.*;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Tokenizer {
     public List<IToken> getTokenList(String input) {
-        int quotations = 0;
+        int parentheses  = 0; // ()
+        int brackets  = 0; // []
+        int braces = 0; // {}
+        int pipes = 0; // ||
         if (input == null || input.isEmpty()) {
             return new LinkedList<>();
         }
+        String originalInput;
+        do {
+            originalInput = input;
+            input = input.replaceAll("\\(", " ( ");
+            input = input.replaceAll("\\)", " ) ");
+            input = input.replaceAll("\\[", " [ ");
+            input = input.replaceAll("]", " ] ");
+            input = input.replaceAll("\\{", " { ");
+            input = input.replaceAll("}", " } ");
+            input = input.replaceAll(" {2}", " ");
+        } while (!originalInput.equals(input));
+        input = input.replaceAll("CONDITION \\(", "CONDITION(");
+        input = input.replaceAll(" {2}", " ");
+        input = input.trim();
         String[] inputTokens = input.split(" ");
         List<List<IToken>> programs = new LinkedList<>();
         List<IToken> tokenList = new LinkedList<>();
@@ -90,24 +111,59 @@ public class Tokenizer {
             } else if(token.toUpperCase().matches("CHOOSE")) {
                 IToken iToken = new ChooseToken();
                 tokenList.add(iToken);
+            } else if(token.toUpperCase().matches("CONDITION\\|-")) {
+                programs.add(tokenList);
+                tokenList = new LinkedList<>();
+                pipes++;
+            } else if (token.equals("-|")) {
+                System.out.println(tokenList.size() - 3 * pipes);
+                IToken iToken = new ConditionToken(new ArrayList<>(List.of(tokenList.remove(tokenList.size() - 3 * pipes))), new ArrayList<>(List.of(tokenList.remove(tokenList.size() - 3 * pipes + 1))), new ArrayList<>(List.of(tokenList.remove(tokenList.size() - 3 * pipes + 2))));
+                tokenList = new LinkedList<>();
+                tokenList.add(iToken);
+                tokenList.addAll(0, programs.removeLast());
+                pipes--;
             } else if (token.toUpperCase().matches("WHILE")) {
                 IToken iToken = new WhileToken();
+                tokenList.add(iToken);
+            } else if (token.equals("ID")) {
+                IToken iToken = new IDToken();
                 tokenList.add(iToken);
             } else if (token.equals("{")) {
                 programs.add(tokenList);
                 tokenList = new LinkedList<>();
-                quotations++;
+                braces++;
             } else if (token.equals("}")) {
-                quotations--;
                 IToken iToken = new QuotationToken(tokenList);
                 tokenList = new LinkedList<>();
                 tokenList.add(iToken);
                 tokenList.addAll(0, programs.removeLast());
+                braces--;
+            } else if (token.equals("[")) {
+                programs.add(tokenList);
+                tokenList = new LinkedList<>();
+                brackets++;
+            } else if (token.equals("]")) {
+                IToken iToken = new CombinationToken(tokenList);
+                tokenList = new LinkedList<>();
+                tokenList.add(iToken);
+                programs.add(programs.size() - brackets - parentheses - pipes, tokenList);
+                tokenList = programs.removeLast();
+                brackets--;
+            } else if (token.equals("(")) {
+                programs.add(tokenList);
+                tokenList = new LinkedList<>();
+                parentheses++;
+            } else if (token.equals(")")) {
+                IToken iToken = new CombinationToken(tokenList);
+                tokenList = new LinkedList<>();
+                tokenList.add(iToken);
+                tokenList.addAll(0, programs.removeLast());
+                parentheses--;
             } else {
                 throw new RuntimeException(tokenList.toString());
             }
         }
-        if(quotations > 0) {
+        if(parentheses != 0 || brackets != 0 || braces != 0 || pipes != 0) {
             throw new RuntimeException(tokenList.toString());
         }
         return tokenList;

@@ -26,7 +26,7 @@ public class CombinationToken implements IFunctionToken {
                 tokens.addAll(0, result);
             }
             if(!tokens.isEmpty()) {
-                return List.of(this);
+                return new LinkedList<>(List.of(this));
             }
         }
         return null;
@@ -44,11 +44,17 @@ public class CombinationToken implements IFunctionToken {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
+        if(this.tokens.size() > 1 || !(this.tokens.getFirst() instanceof CombinationToken)) {
+            stringBuilder.append("( ");
+        }
         for(IToken token : tokens){
             stringBuilder.append(token).append(" ");
         }
         if(!stringBuilder.isEmpty()){
             stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        }
+        if(this.tokens.size() > 1 || !(this.tokens.getFirst() instanceof CombinationToken)) {
+            stringBuilder.append(" )");
         }
         return stringBuilder.toString();
     }
@@ -56,11 +62,17 @@ public class CombinationToken implements IFunctionToken {
     @Override
     public String toJSON() {
         StringBuilder stringBuilder = new StringBuilder();
+        if(this.tokens.size() > 1 || !(this.tokens.getFirst() instanceof CombinationToken)) {
+            stringBuilder.append("( ");
+        }
         for(IToken token : tokens){
-            stringBuilder.append(token).append(" ");
+            stringBuilder.append(token.toJSON()).append(" ");
         }
         if(!stringBuilder.isEmpty()){
             stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        }
+        if(this.tokens.size() > 1 || !(this.tokens.getFirst() instanceof CombinationToken)) {
+            stringBuilder.append(" )");
         }
         return stringBuilder.toString();
     }

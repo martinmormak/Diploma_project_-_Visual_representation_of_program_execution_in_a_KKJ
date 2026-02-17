@@ -26,6 +26,6 @@ public class ClearToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"CLEAR\"";
+        return "CLEAR";
     }
 }

@@ -38,6 +38,6 @@ public class SubToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"SUB\"";
+        return "SUB";
     }
 }

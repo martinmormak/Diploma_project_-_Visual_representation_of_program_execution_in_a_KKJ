@@ -30,7 +30,7 @@ public class PopToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"POP\"";
+        return "POP";
     }
 }
 

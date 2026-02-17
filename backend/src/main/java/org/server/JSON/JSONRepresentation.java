@@ -2,7 +2,6 @@ package org.server.JSON;
 
 import org.core.tokens.interfaces.IToken;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -36,10 +35,10 @@ public class JSONRepresentation {
 
     public String toJson() {
         String tokensJson = tokens.stream()
-                .map(IToken::toString)
+                .map(IToken::toJSON)
                 .collect(Collectors.joining(" ", "[\"", "\"]"));
         String stackJson = stack.stream()
-                .map(IToken::toString)
+                .map(IToken::toJSON)
                 .collect(Collectors.joining(" ", "[\"", "\"]"));
 
         return String.format("{\"tokens\": %s, \"stack\": %s}", tokensJson, stackJson);

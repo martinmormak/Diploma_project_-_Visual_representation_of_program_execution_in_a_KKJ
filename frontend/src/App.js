@@ -13,17 +13,69 @@ function App() {
             label: "— Select an example —",
             value: ""
         },
+
         {
-            label: "Example 1: Simple program",
-            value: "5 3 ADD"
+            label: "Example 1: Simple arithmetic",
+            value: "3 4 add"
+        },
+
+        {
+            label: "Example 2: Arithmetic + stack ops",
+            value: "3 4 add dup mul"
+        },
+
+        {
+            label: "Example 3: Using stack manipulation",
+            value: "5 6 swap sub"
         },
         {
-            label: "Example 2: Stack ops",
-            value: "10 DUP MUL"
+            label: "Example 4: Conditional choose",
+            value: "0 ispos 5 6 choose"
         },
+
         {
-            label: "Example 3: Invalid program",
-            value: "1 ADD"
+            label: "Example 5: Composition with quotations",
+            value: "14 {dup dup} {add add} compose apply"
+        },
+
+        {
+            label: "Example 6: Invalid program (stack underflow)",
+            value: "1 add"
+        },
+
+        {
+            label: "Example 7: Countdown with while",
+            value: "5 {dup 0 gt} {dup 1 sub} while"
+        },
+
+        {
+            label: "Example 8: Factorial (iterative)",
+            value: "5 1 swap {dup 1 gt} {swap over mul swap 1 sub} while pop"
+        },
+
+        {
+            label: "Example 9: Sum from N down to 1",
+            value: "5 0 swap {dup 0 gt} {swap over add swap 1 sub} while pop"
+        },
+
+        {
+            label: "Example 10: Double until > 100",
+            value: "1 {dup 100 lt} {dup add} while"
+        },
+
+        {
+            label: "Example 11: Nested while",
+            value: "3 {dup 0 gt} {2 {dup 0 gt} {1 sub} while 1 sub} while"
+        },
+
+        {
+            label: "Example 12: Infinite loop (logical error)",
+            value: "1 {dup 0 gt} {dup} while"
+        },
+
+        {
+            label: "Example 13: Invalid while (missing quotation)",
+            value: "5 dup 0 gt {1 sub} while"
         }
     ];
 
@@ -85,6 +137,24 @@ function App() {
         document.body.removeChild(element);
     }
 
+    function tryContinueExecution(newVisibleLines) {
+        if (newVisibleLines > output.length) return;
+
+        const lastRow = output[newVisibleLines - 1];
+
+        if (
+            lastRow &&
+            lastRow.tokens &&
+            lastRow.tokens.join("").trim() !== "" &&
+            lastRow.tokens.join("").trim() !== "ERROR"
+        ) {
+            runProgramFromPoint(
+                lastRow.tokens.join(" "),
+                lastRow.stack.join(" ")
+            );
+        }
+    }
+
     async function validateProgram() {
         try {
             const response = await fetch(
@@ -99,8 +169,9 @@ function App() {
             );
 
             if (response.ok === true) {
-                await runProgram();
+                await runProgramFromScratch();
             } else {
+                console.log(response);
                 setOutput([{ tokens: ["ERROR"], stack: ["validateProgram(): Network response was not ok."] }]);
                 setVisibleLines(1);
             }
@@ -110,7 +181,7 @@ function App() {
         }
     }
 
-    async function runProgram() {
+    async function runProgramFromScratch() {
         try {
             const response = await fetch(
                 backendURL + `/api/v1/simulate/${encodeURIComponent(program)}`,
@@ -122,8 +193,31 @@ function App() {
                 setOutput(data);
                 setVisibleLines(1);
             } else {
-                setOutput([{ tokens: ["ERROR"], stack: ["Network response was not ok"] }]);
-                setVisibleLines(1);
+                const errorText = await response.text();
+                setOutput([{ tokens: ["ERROR"], stack: [errorText] }]);
+                setVisibleLines(1)
+            }
+        } catch (error) {
+            setOutput([{ tokens: ["ERROR"], stack: [error.message] }]);
+            setVisibleLines(1);
+        }
+    }
+
+    async function runProgramFromPoint(tokens, stack) {
+        try {
+            const response = await fetch(
+                backendURL + `/api/v1/simulate/${encodeURIComponent(tokens)}/${encodeURIComponent(stack)}`,
+                { method: "GET" }
+            );
+
+            if (response.ok) {
+                const data = await response.json();
+                setOutput(prev => [...prev, ...data]);
+                setVisibleLines(n  => n + 1);
+            } else {
+                const errorText = await response.text();
+                setOutput([{ tokens: ["ERROR"], stack: [errorText] }]);
+                setVisibleLines(1)
             }
         } catch (error) {
             setOutput([{ tokens: ["ERROR"], stack: [error.message] }]);
@@ -223,9 +317,15 @@ function App() {
                             </button>
                             <button
                                 onClick={() =>
-                                    setVisibleLines((n) =>
-                                        Math.min(output.length, n + 1)
-                                    )
+                                    setVisibleLines((n) => {
+                                        const newValue = Math.min(output.length, n + 1);
+
+                                        if (newValue === output.length) {
+                                            tryContinueExecution(newValue);
+                                        }
+
+                                        return newValue;
+                                    })
                                 }
                             >
                                 Next
@@ -233,13 +333,15 @@ function App() {
                         </div>
                         <div className="bottom-button">
                             <button
-                                onClick={() =>
-                                    setVisibleLines(output.length)
-                                }
+                                onClick={() => {
+                                    const newValue = output.length;
+                                    setVisibleLines(newValue);
+                                    tryContinueExecution(newValue);
+                                }}
                             >
-                                Show all
+                                Show all loaded states
                             </button>
-                            <button onClick={exportTableToFile}>Export table</button>
+                            <button onClick={exportTableToFile}>Export table with loaded states</button>
                         </div>
                     </div>
                 </div>

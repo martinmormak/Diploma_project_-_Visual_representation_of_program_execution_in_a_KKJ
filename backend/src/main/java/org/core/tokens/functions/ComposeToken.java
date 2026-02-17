@@ -40,6 +40,6 @@ public class ComposeToken implements IToken {
 
     @Override
     public String toJSON() {
-        return "\"COMPOSE\"";
+        return "COMPOSE";
     }
 }

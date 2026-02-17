@@ -35,6 +35,6 @@ public class RotlToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"ROTL\"";
+        return "ROTL";
     }
 }

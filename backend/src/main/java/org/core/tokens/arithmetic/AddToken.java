@@ -38,6 +38,6 @@ public class AddToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"ADD\"";
+        return "ADD";
     }
 }

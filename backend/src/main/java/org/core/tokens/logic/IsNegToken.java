@@ -38,6 +38,6 @@ public class IsNegToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"ISNEG\"";
+        return "ISNEG";
     }
 }

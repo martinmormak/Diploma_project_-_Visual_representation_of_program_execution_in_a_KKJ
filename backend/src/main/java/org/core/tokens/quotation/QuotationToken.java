@@ -41,10 +41,10 @@ public class QuotationToken implements IToken {
     @Override
     public String toJSON() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\"{\" ");
+        stringBuilder.append("{ ");
         for(IToken token : tokens){
-            stringBuilder.append(token).append(" ");
+            stringBuilder.append(token.toJSON()).append(" ");
         }
-        return stringBuilder.append("\"}\"").toString();
+        return stringBuilder.append("}").toString();
     }
 }

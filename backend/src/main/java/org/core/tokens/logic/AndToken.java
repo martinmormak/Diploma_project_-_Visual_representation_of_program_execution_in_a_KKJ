@@ -38,6 +38,6 @@ public class AndToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"AND\"";
+        return "AND";
     }
 }

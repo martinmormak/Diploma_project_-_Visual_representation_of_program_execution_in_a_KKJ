@@ -5,6 +5,7 @@ import org.core.tokens.interfaces.IToken;
 import org.core.tokens.quotation.CombinationToken;
 import org.core.tokens.quotation.CompositionToken;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
@@ -21,7 +22,7 @@ public class ApplyOverToken implements IToken {
                 } else if(pop1 instanceof CombinationToken) {
                     return ((CombinationToken) pop1).getTokens();
                 }
-                return List.of(pop1);
+                return new LinkedList<>(List.of(pop1));
             } else {
                 throw new RuntimeException("Expected IFunctionToken, IToken and get " + pop2.getClass().getSimpleName() + ", " + pop1.getClass().getSimpleName());
             }
@@ -42,6 +43,6 @@ public class ApplyOverToken implements IToken {
 
     @Override
     public String toJSON() {
-        return "\"APPLYOVER\"";
+        return "APPLYOVER";
     }
 }

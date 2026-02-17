@@ -33,6 +33,6 @@ public class SwapToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"SWAP\"";
+        return "SWAP";
     }
 }

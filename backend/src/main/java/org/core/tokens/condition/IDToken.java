@@ -25,7 +25,7 @@ public class IDToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"ID\"";
+        return "ID";
     }
 }
 

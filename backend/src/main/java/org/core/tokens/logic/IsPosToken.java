@@ -38,6 +38,6 @@ public class IsPosToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"ISPOS\"";
+        return "ISPOS";
     }
 }

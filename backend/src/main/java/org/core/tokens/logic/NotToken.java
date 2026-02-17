@@ -37,6 +37,6 @@ public class NotToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"NOT\"";
+        return "NOT";
     }
 }

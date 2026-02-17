@@ -55,7 +55,7 @@ public class KKJMain {
         if (configReader.getToggleState("termRewritingEnabled")) {
                 /*for (IToken token : tokens) {
                     while (!termRewritingIsSolved(token)) {
-                        List<String> substitutions = new ArrayList<>();
+                        List<String> substitutions = new LinkedList<>();
                         List<IToken> newTokens = new LinkedList<>();
                         if (token != null) {
                             System.out.print(token);

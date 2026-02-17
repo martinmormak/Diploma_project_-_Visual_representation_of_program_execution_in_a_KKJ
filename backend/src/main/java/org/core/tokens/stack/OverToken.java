@@ -33,6 +33,6 @@ public class OverToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"OVER\"";
+        return "OVER";
     }
 }

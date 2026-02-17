@@ -38,6 +38,6 @@ public class CmpToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"CMP\"";
+        return "CMP";
     }
 }

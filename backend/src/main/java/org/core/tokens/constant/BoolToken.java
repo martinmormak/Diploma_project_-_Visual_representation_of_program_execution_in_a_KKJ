@@ -64,6 +64,6 @@ public class BoolToken implements ILogicToken {
 
     @Override
     public String toJSON() {
-        return "\"" + value.toString().toUpperCase() + "\"";
+        return value.toString().toUpperCase();
     }
 }

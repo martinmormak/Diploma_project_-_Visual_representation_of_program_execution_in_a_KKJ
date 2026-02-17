@@ -38,6 +38,6 @@ public class MulToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"MUL\"";
+        return "MUL";
     }
 }

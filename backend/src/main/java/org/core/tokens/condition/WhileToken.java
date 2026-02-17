@@ -5,10 +5,7 @@ import org.core.tokens.interfaces.IToken;
 import org.core.tokens.quotation.CombinationToken;
 import org.core.tokens.quotation.QuotationToken;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class WhileToken implements IFunctionToken {
 
@@ -18,9 +15,9 @@ public class WhileToken implements IFunctionToken {
     @Override
     public List<IToken> stackSolving(Stack<IToken> stack) {
         if(stack.size()>=2) {
-            List<IToken> branch = new ArrayList<>();
+            List<IToken> branch = new LinkedList<>();
             branch.add(stack.pop());
-            List<IToken> condition = new ArrayList<>();
+            List<IToken> condition = new LinkedList<>();
             condition.add(stack.pop());
             List<IToken> branchClone = new LinkedList<>();
             List<IToken> conditionClone = new LinkedList<>();
@@ -30,13 +27,14 @@ public class WhileToken implements IFunctionToken {
             for(IToken token : condition) {
                 conditionClone.add(token.clone());
             }
-            List<IToken> loopBranch = List.of(
+
+            List<IToken> loopBranch = new LinkedList<>(List.of(new CombinationToken(new LinkedList<>(List.of(
                     new CombinationToken(branch),
                     new QuotationToken(conditionClone),
                     new QuotationToken(branchClone),
                     new WhileToken()
-            );
-            return List.of(new ConditionToken(condition, loopBranch, List.of(new IDToken())));
+            )))));
+            return new LinkedList<>(List.of(new ConditionToken(condition, loopBranch, List.of(new IDToken()))));
         } else {
             throw new RuntimeException("In stack must be >= 2 items and is empty");
         }
@@ -57,7 +55,7 @@ public class WhileToken implements IFunctionToken {
     @Override
     public String toJSON() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\"WHILE\"");
+        stringBuilder.append("WHILE");
         return stringBuilder.toString();
     }
 }

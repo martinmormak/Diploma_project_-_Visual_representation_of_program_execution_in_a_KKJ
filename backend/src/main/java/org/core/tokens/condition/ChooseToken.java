@@ -4,7 +4,6 @@ import org.core.tokens.constant.BoolToken;
 import org.core.tokens.interfaces.IFunctionToken;
 import org.core.tokens.interfaces.IToken;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -24,10 +23,10 @@ public class ChooseToken implements IFunctionToken {
             if(condition instanceof BoolToken) {
                 if (((BoolToken) condition).getValue() == true) {
                     stack.push(trueBranch);
-                    return new ArrayList<>();
+                    return new LinkedList<>();
                 } else {
                     stack.push(falseBranch);
-                    return new ArrayList<>();
+                    return new LinkedList<>();
                 }
             } else {
                 throw new RuntimeException("Condition must be BoolToken and is " + condition.getClass().getSimpleName());
@@ -49,6 +48,6 @@ public class ChooseToken implements IFunctionToken {
 
     @Override
     public String toJSON() {
-        return "\"CHOOSE\"";
+        return "CHOOSE";
     }
 }
