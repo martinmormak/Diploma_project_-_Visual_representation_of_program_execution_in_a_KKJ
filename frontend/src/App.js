@@ -1,5 +1,5 @@
 import './App.css';
-import {useState, useRef} from "react";
+import {useState, useRef, useEffect} from "react";
 
 function App() {
     const backendURL = process.env.REACT_APP_BACKEND_URL;
@@ -7,6 +7,7 @@ function App() {
     const [output, setOutput] = useState([]);
     const [visibleLines, setVisibleLines] = useState(0);
     const fileInputRef = useRef(null);
+    const tableWrapperRef = useRef(null);
 
     const examples = [
         {
@@ -110,6 +111,15 @@ function App() {
         // allow loading the same file again
         event.target.value = null;
     }
+
+    useEffect(() => {
+        if (tableWrapperRef.current) {
+            tableWrapperRef.current.scrollTo({
+                top: tableWrapperRef.current.scrollHeight,
+                behavior: "smooth"
+            });
+        }
+    }, [visibleLines]);
 
     function exportTableToFile() {
         const csv = [
@@ -299,7 +309,7 @@ function App() {
                 <div className="output-section">
                     <div className="output-screen">
                         <h3>Output:</h3>
-                        <div className="table-wrapper">
+                        <div className="table-wrapper" ref={tableWrapperRef}>
                             <OutputTable
                                 data={output}
                                 visibleLines={visibleLines}
@@ -339,9 +349,9 @@ function App() {
                                     tryContinueExecution(newValue);
                                 }}
                             >
-                                Show all loaded states
+                                Show all states
                             </button>
-                            <button onClick={exportTableToFile}>Export table with loaded states</button>
+                            <button onClick={exportTableToFile}>Export table with states</button>
                         </div>
                     </div>
                 </div>

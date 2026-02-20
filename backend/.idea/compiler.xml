@@ -12,7 +12,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="KKJ" options="-parameters" />
+      <module name="KKJ" options="" />
     </option>
   </component>
 </project>

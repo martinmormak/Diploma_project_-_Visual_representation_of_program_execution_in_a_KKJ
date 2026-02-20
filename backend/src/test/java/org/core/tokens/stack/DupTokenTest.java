@@ -51,10 +51,10 @@ class DupTokenTest {
     void testToStringOutput() {
         List<IToken> tokens1 = new LinkedList<>(List.of(new IntToken(1), new DupToken()));
         CombinationToken combinationToken1 = new CombinationToken(tokens1);
-        assertEquals("1 DUP", combinationToken1.toString());
+        assertEquals("( 1 DUP )", combinationToken1.toString());
 
         List<IToken> tokens2 = new LinkedList<>(List.of(new BoolToken(true), new DupToken()));
         CombinationToken combinationToken2 = new CombinationToken(tokens2);
-        assertEquals("TRUE DUP", combinationToken2.toString());
+        assertEquals("( TRUE DUP )", combinationToken2.toString());
     }
 }

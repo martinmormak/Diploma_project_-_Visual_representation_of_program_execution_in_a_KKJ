@@ -120,18 +120,18 @@ class SwapTokenTest {
     void testToStringOutput() {
         List<IToken> tokens1 = new LinkedList<>(List.of(new IntToken(4),new IntToken(5), new SwapToken()));
         CombinationToken combinationToken1 = new CombinationToken(tokens1);
-        assertEquals("4 5 SWAP", combinationToken1.toString());
+        assertEquals("( 4 5 SWAP )", combinationToken1.toString());
 
         List<IToken> tokens2 = new LinkedList<>(List.of(new IntToken(4),new BoolToken(false), new SwapToken()));
         CombinationToken combinationToken2 = new CombinationToken(tokens2);
-        assertEquals("4 FALSE SWAP", combinationToken2.toString());
+        assertEquals("( 4 FALSE SWAP )", combinationToken2.toString());
 
         List<IToken> tokens3 = new LinkedList<>(List.of( new BoolToken(true), new IntToken(5), new SwapToken()));
         CombinationToken combinationToken3 = new CombinationToken(tokens3);
-        assertEquals("TRUE 5 SWAP", combinationToken3.toString());
+        assertEquals("( TRUE 5 SWAP )", combinationToken3.toString());
 
         List<IToken> tokens4 = new LinkedList<>(List.of(new BoolToken(true), new BoolToken(false), new SwapToken()));
         CombinationToken combinationToken4 = new CombinationToken(tokens4);
-        assertEquals("TRUE FALSE SWAP", combinationToken4.toString());
+        assertEquals("( TRUE FALSE SWAP )", combinationToken4.toString());
     }
 }

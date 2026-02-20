@@ -252,34 +252,34 @@ class RotlTokenTest {
     void testToStringOutput() {
         List<IToken> tokens1 = new LinkedList<>(List.of(new IntToken(4), new IntToken(8), new IntToken(5), new RotlToken()));
         CombinationToken combinationToken1 = new CombinationToken(tokens1);
-        assertEquals("4 8 5 ROTL", combinationToken1.toString());
+        assertEquals("( 4 8 5 ROTL )", combinationToken1.toString());
 
         List<IToken> tokens2 = new LinkedList<>(List.of(new IntToken(4), new IntToken(8), new BoolToken(false), new RotlToken()));
         CombinationToken combinationToken2 = new CombinationToken(tokens2);
-        assertEquals("4 8 FALSE ROTL", combinationToken2.toString());
+        assertEquals("( 4 8 FALSE ROTL )", combinationToken2.toString());
 
         List<IToken> tokens3 = new LinkedList<>(List.of(new IntToken(4), new BoolToken(true), new IntToken(5), new RotlToken()));
         CombinationToken combinationToken3 = new CombinationToken(tokens3);
-        assertEquals("4 TRUE 5 ROTL", combinationToken3.toString());
+        assertEquals("( 4 TRUE 5 ROTL )", combinationToken3.toString());
 
         List<IToken> tokens4 = new LinkedList<>(List.of(new IntToken(4), new BoolToken(true), new BoolToken(false), new RotlToken()));
         CombinationToken combinationToken4 = new CombinationToken(tokens4);
-        assertEquals("4 TRUE FALSE ROTL", combinationToken4.toString());
+        assertEquals("( 4 TRUE FALSE ROTL )", combinationToken4.toString());
 
         List<IToken> tokens5 = new LinkedList<>(List.of(new BoolToken(false), new IntToken(8), new IntToken(5), new RotlToken()));
         CombinationToken combinationToken5 = new CombinationToken(tokens5);
-        assertEquals("FALSE 8 5 ROTL", combinationToken5.toString());
+        assertEquals("( FALSE 8 5 ROTL )", combinationToken5.toString());
 
         List<IToken> tokens6 = new LinkedList<>(List.of(new BoolToken(false), new IntToken(8), new BoolToken(false), new RotlToken()));
         CombinationToken combinationToken6 = new CombinationToken(tokens6);
-        assertEquals("FALSE 8 FALSE ROTL", combinationToken6.toString());
+        assertEquals("( FALSE 8 FALSE ROTL )", combinationToken6.toString());
 
         List<IToken> tokens7 = new LinkedList<>(List.of(new BoolToken(false), new BoolToken(true), new IntToken(5), new RotlToken()));
         CombinationToken combinationToken7 = new CombinationToken(tokens7);
-        assertEquals("FALSE TRUE 5 ROTL", combinationToken7.toString());
+        assertEquals("( FALSE TRUE 5 ROTL )", combinationToken7.toString());
 
         List<IToken> tokens8 = new LinkedList<>(List.of(new BoolToken(false), new BoolToken(true), new BoolToken(false), new RotlToken()));
         CombinationToken combinationToken8 = new CombinationToken(tokens8);
-        assertEquals("FALSE TRUE FALSE ROTL", combinationToken8.toString());
+        assertEquals("( FALSE TRUE FALSE ROTL )", combinationToken8.toString());
     }
 }

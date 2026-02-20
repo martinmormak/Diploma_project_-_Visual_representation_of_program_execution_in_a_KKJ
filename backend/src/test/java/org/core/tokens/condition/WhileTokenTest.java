@@ -92,10 +92,10 @@ class WhileTokenTest {
     void testToStringOutput() {
         List<IToken> tokens1 = new LinkedList<>(List.of(new BoolToken(true), new IntToken(1), new IntToken(2), new WhileToken()));
         CombinationToken combinationToken1 = new CombinationToken(tokens1);
-        assertEquals("TRUE 1 2 WHILE", combinationToken1.toString());
+        assertEquals("( TRUE 1 2 WHILE )", combinationToken1.toString());
 
         List<IToken> tokens2 = new LinkedList<>(List.of(new BoolToken(false), new IntToken(1), new IntToken(2), new WhileToken()));
         CombinationToken combinationToken2 = new CombinationToken(tokens2);
-        assertEquals("FALSE 1 2 WHILE", combinationToken2.toString());
+        assertEquals("( FALSE 1 2 WHILE )", combinationToken2.toString());
     }
 }

@@ -131,18 +131,18 @@ class AndTokenTest {
     void testToStringOutput() {
         List<IToken> tokens1 = new LinkedList<>(List.of(new BoolToken(false), new BoolToken(false), new AndToken()));
         CombinationToken combinationToken1 = new CombinationToken(tokens1);
-        assertEquals("FALSE FALSE AND", combinationToken1.toString());
+        assertEquals("( FALSE FALSE AND )", combinationToken1.toString());
 
         List<IToken> tokens2 = new LinkedList<>(List.of(new BoolToken(false), new BoolToken(true), new AndToken()));
         CombinationToken combinationToken2 = new CombinationToken(tokens2);
-        assertEquals("FALSE TRUE AND", combinationToken2.toString());
+        assertEquals("( FALSE TRUE AND )", combinationToken2.toString());
 
         List<IToken> tokens3 = new LinkedList<>(List.of(new BoolToken(true), new BoolToken(false), new AndToken()));
         CombinationToken combinationToken3 = new CombinationToken(tokens3);
-        assertEquals("TRUE FALSE AND", combinationToken3.toString());
+        assertEquals("( TRUE FALSE AND )", combinationToken3.toString());
 
         List<IToken> tokens4 = new LinkedList<>(List.of(new BoolToken(true), new BoolToken(true), new AndToken()));
         CombinationToken combinationToken4 = new CombinationToken(tokens4);
-        assertEquals("TRUE TRUE AND", combinationToken4.toString());
+        assertEquals("( TRUE TRUE AND )", combinationToken4.toString());
     }
 }

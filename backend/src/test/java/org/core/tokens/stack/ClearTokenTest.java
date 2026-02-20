@@ -47,18 +47,18 @@ class ClearTokenTest {
     void testToStringOutput() {
         List<IToken> tokens1 = new LinkedList<>(List.of(new BoolToken(false), new BoolToken(false), new ClearToken()));
         CombinationToken combinationToken1 = new CombinationToken(tokens1);
-        assertEquals("FALSE FALSE CLEAR", combinationToken1.toString());
+        assertEquals("( FALSE FALSE CLEAR )", combinationToken1.toString());
 
         List<IToken> tokens2 = new LinkedList<>(List.of(new BoolToken(false), new BoolToken(true), new ClearToken()));
         CombinationToken combinationToken2 = new CombinationToken(tokens2);
-        assertEquals("FALSE TRUE CLEAR", combinationToken2.toString());
+        assertEquals("( FALSE TRUE CLEAR )", combinationToken2.toString());
 
         List<IToken> tokens3 = new LinkedList<>(List.of(new BoolToken(true), new BoolToken(false), new ClearToken()));
         CombinationToken combinationToken3 = new CombinationToken(tokens3);
-        assertEquals("TRUE FALSE CLEAR", combinationToken3.toString());
+        assertEquals("( TRUE FALSE CLEAR )", combinationToken3.toString());
 
         List<IToken> tokens4 = new LinkedList<>(List.of(new BoolToken(true), new BoolToken(true), new ClearToken()));
         CombinationToken combinationToken4 = new CombinationToken(tokens4);
-        assertEquals("TRUE TRUE CLEAR", combinationToken4.toString());
+        assertEquals("( TRUE TRUE CLEAR )", combinationToken4.toString());
     }
 }

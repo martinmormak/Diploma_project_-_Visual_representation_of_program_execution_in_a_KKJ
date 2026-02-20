@@ -38,8 +38,8 @@ textarea {
 }
 
 button {
-    padding: 2vh 2vw;
-    font-size: 1em;
+    padding: 1vh 1vw;
+    font-size: 0.75em;
     align-self: flex-start;
 }
 
@@ -169,6 +169,10 @@ pre {
         width: 30vw;
     }
 
+    button {
+        font-size: 1em;
+    }
+
     .output-section {
         display: flex;
         flex-direction: row;
@@ -201,8 +205,8 @@ pre {
     }
 
     .output-buttons button {
-        width: 100%;
-        padding: 2vh 2vw;
+        width: 10vw;
+        padding: 1.5vh 1.5vw;
         font-size: 1em;
     }
 }

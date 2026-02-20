@@ -62,10 +62,10 @@ class IsPosTokenTest {
     void testToStringOutput() {
         List<IToken> tokens1 = new LinkedList<>(List.of(new IntToken(1), new IsPosToken()));
         CombinationToken combinationToken1 = new CombinationToken(tokens1);
-        assertEquals("1 ISPOS", combinationToken1.toString());
+        assertEquals("( 1 ISPOS )", combinationToken1.toString());
 
         List<IToken> tokens2 = new LinkedList<>(List.of(new IntToken(-1), new IsPosToken()));
         CombinationToken combinationToken2 = new CombinationToken(tokens2);
-        assertEquals("-1 ISPOS", combinationToken2.toString());
+        assertEquals("( -1 ISPOS )", combinationToken2.toString());
     }
 }

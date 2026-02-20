@@ -100,10 +100,10 @@ class AddTokenTest {
     void testToStringOutput() {
         List<IToken> tokens1 = new LinkedList<>(List.of(new IntToken(1), new IntToken(2), new AddToken()));
         CombinationToken combinationToken1 = new CombinationToken(tokens1);
-        assertEquals("1 2 ADD", combinationToken1.toString());
+        assertEquals("( 1 2 ADD )", combinationToken1.toString());
 
         List<IToken> tokens2 = new LinkedList<>(List.of(new IntToken(2), new IntToken(1), new AddToken()));
         CombinationToken combinationToken2 = new CombinationToken(tokens2);
-        assertEquals("2 1 ADD", combinationToken2.toString());
+        assertEquals("( 2 1 ADD )", combinationToken2.toString());
     }
 }

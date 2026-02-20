@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class KKJController {
 
     @PostMapping("/validate/{value}")
-    public ResponseEntity<String> validateInput(@PathVariable String value) {
+    public ResponseEntity<String> validateInput(@PathVariable("value") String value) {
         System.out.println("---------- validateInput ----------");
         if(value==null){
             return new ResponseEntity<>("Input is empty", HttpStatus.BAD_REQUEST);
@@ -52,7 +52,7 @@ public class KKJController {
     }
 
     @GetMapping("/simulate/{value}")
-    public ResponseEntity<String> getSimulationFromScratch(@PathVariable String value) {
+    public ResponseEntity<String> getSimulationFromScratch(@PathVariable("value") String value) {
         System.out.println("---------- getSimulationFromScratch ----------");
         if(value==null){
             return new ResponseEntity<>("Input is empty", HttpStatus.BAD_REQUEST);
@@ -92,7 +92,7 @@ public class KKJController {
     }
 
     @GetMapping("/simulate/{tokensValue}/{stackValue}")
-    public ResponseEntity<String> getSimulationFromPoint(@PathVariable String tokensValue, @PathVariable String stackValue) {
+    public ResponseEntity<String> getSimulationFromPoint(@PathVariable("tokensValue") String tokensValue, @PathVariable("stackValue") String stackValue) {
         System.out.println("---------- getSimulationFromPoint ----------");
         if(tokensValue==null){
             return new ResponseEntity<>("Input is empty", HttpStatus.BAD_REQUEST);

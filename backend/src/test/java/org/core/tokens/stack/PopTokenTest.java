@@ -47,10 +47,10 @@ class PopTokenTest {
     void testToStringOutput() {
         List<IToken> tokens1 = new LinkedList<>(List.of(new IntToken(1), new PopToken()));
         CombinationToken combinationToken1 = new CombinationToken(tokens1);
-        assertEquals("1 POP", combinationToken1.toString());
+        assertEquals("( 1 POP )", combinationToken1.toString());
 
         List<IToken> tokens2 = new LinkedList<>(List.of(new BoolToken(true), new PopToken()));
         CombinationToken combinationToken2 = new CombinationToken(tokens2);
-        assertEquals("TRUE POP", combinationToken2.toString());
+        assertEquals("( TRUE POP )", combinationToken2.toString());
     }
 }

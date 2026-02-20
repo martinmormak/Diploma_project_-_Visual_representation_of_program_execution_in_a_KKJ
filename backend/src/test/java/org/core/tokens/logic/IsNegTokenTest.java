@@ -62,10 +62,10 @@ class IsNegTokenTest {
     void testToStringOutput() {
         List<IToken> tokens1 = new LinkedList<>(List.of(new IntToken(1), new IsNegToken()));
         CombinationToken combinationToken1 = new CombinationToken(tokens1);
-        assertEquals("1 ISNEG", combinationToken1.toString());
+        assertEquals("( 1 ISNEG )", combinationToken1.toString());
 
         List<IToken> tokens2 = new LinkedList<>(List.of(new IntToken(-1), new IsNegToken()));
         CombinationToken combinationToken2 = new CombinationToken(tokens2);
-        assertEquals("-1 ISNEG", combinationToken2.toString());
+        assertEquals("( -1 ISNEG )", combinationToken2.toString());
     }
 }

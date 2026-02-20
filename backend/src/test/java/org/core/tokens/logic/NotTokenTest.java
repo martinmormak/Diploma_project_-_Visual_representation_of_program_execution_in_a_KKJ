@@ -62,10 +62,10 @@ class NotTokenTest {
     void testToStringOutput() {
         List<IToken> tokens1 = new LinkedList<>(List.of(new BoolToken(false), new NotToken()));
         CombinationToken combinationToken1 = new CombinationToken(tokens1);
-        assertEquals("FALSE NOT", combinationToken1.toString());
+        assertEquals("( FALSE NOT )", combinationToken1.toString());
 
         List<IToken> tokens2 = new LinkedList<>(List.of(new BoolToken(true), new NotToken()));
         CombinationToken combinationToken2 = new CombinationToken(tokens2);
-        assertEquals("TRUE NOT", combinationToken2.toString());
+        assertEquals("( TRUE NOT )", combinationToken2.toString());
     }
 }

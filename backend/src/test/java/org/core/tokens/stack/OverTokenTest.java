@@ -104,18 +104,18 @@ class OverTokenTest {
     void testToStringOutput() {
         List<IToken> tokens1 = new LinkedList<>(List.of(new IntToken(1), new IntToken(4), new OverToken()));
         CombinationToken combinationToken1 = new CombinationToken(tokens1);
-        assertEquals("1 4 OVER", combinationToken1.toString());
+        assertEquals("( 1 4 OVER )", combinationToken1.toString());
 
         List<IToken> tokens2 = new LinkedList<>(List.of(new IntToken(1), new BoolToken(false), new OverToken()));
         CombinationToken combinationToken2 = new CombinationToken(tokens2);
-        assertEquals("1 FALSE OVER", combinationToken2.toString());
+        assertEquals("( 1 FALSE OVER )", combinationToken2.toString());
 
         List<IToken> tokens3 = new LinkedList<>(List.of(new BoolToken(true), new IntToken(4), new OverToken()));
         CombinationToken combinationToken3 = new CombinationToken(tokens3);
-        assertEquals("TRUE 4 OVER", combinationToken3.toString());
+        assertEquals("( TRUE 4 OVER )", combinationToken3.toString());
 
         List<IToken> tokens4 = new LinkedList<>(List.of(new BoolToken(true), new BoolToken(false), new OverToken()));
         CombinationToken combinationToken4 = new CombinationToken(tokens4);
-        assertEquals("TRUE FALSE OVER", combinationToken4.toString());
+        assertEquals("( TRUE FALSE OVER )", combinationToken4.toString());
     }
 }
