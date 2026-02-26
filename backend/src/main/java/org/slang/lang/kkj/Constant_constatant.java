@@ -30,7 +30,13 @@ public final class Constant_constatant
   {
     switch (_phrase)
     {
-      case Constant.Num(var n) ->
+      case Constant.PosNum(var n) ->
+      {
+        return (_Operation)(var te) -> 
+        {
+        };
+      }
+      case Constant.NegNum(var n) ->
       {
         return (_Operation)(var te) -> 
         {

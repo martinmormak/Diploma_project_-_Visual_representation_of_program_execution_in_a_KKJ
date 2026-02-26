@@ -30,7 +30,8 @@ dSequence returns [ Sequence _result ] :
 |  o=dConditionsOperation { $_result = new Sequence.ConditionsOp($o._result); }
 ;
 dConstant returns [ Constant _result ] :
-   n=dNUM { $_result = new Constant.Num($n._result); }
+   n=dNUM { $_result = new Constant.PosNum($n._result); }
+|  '-' n=dNUM { $_result = new Constant.NegNum($n._result); }
 |  'TRUE' { $_result = new Constant.True(); }
 |  'FALSE' { $_result = new Constant.False(); }
 ;

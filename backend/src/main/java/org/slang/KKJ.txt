@@ -33,7 +33,7 @@ language KKJ
   {
     Program = Prog[Sequence];
     Sequence = Seq[Sequence,Sequence] + Cons[Constant] + ArithmeticOp[ArithmeticOperations] + LogicalOp[LogicalOperations] + StackOp[StackOperations] + FunctionOp[FunctionOperations] + ConditionsOp[ConditionsOperation];
-    Constant = Num[NUM] + True + False;
+    Constant = PosNum[NUM] + NegNum[NUM] + True + False;
     ArithmeticOperations = Add + Sub + Mul + Cmp;
     LogicalOperations = Not + And + IsNeg + IsPos;
     StackOperations = Clear + Id + Pop + Dup + Over + Swap + Rotl;
@@ -62,7 +62,8 @@ language KKJ
     }
     domain Constant
     {
-      case Num[n] → # _result = n; #;
+      case PosNum[n] → # _result = n; #;
+      case NegNum[n] → # _result = n; #;
       case True → # _result = "TRUE"; #;
       case False → # _result = "FALSE"; #;
     }
@@ -125,7 +126,8 @@ language KKJ
     }
     domain Constant
     {
-      case # n=dNUM # → Num[n];
+      case # n=dNUM # → PosNum[n];
+      case # '-' n=dNUM # → NegNum[n];
       case # 'TRUE' # → True;
       case # 'FALSE' # → False;
     }
@@ -215,7 +217,10 @@ language KKJ
   }
   judgment #List<IToken># ⊢ Constant: constatant
   {
-    inference te ⊢ Num[n]: constatant
+    inference te ⊢ PosNum[n]: constatant
+    {
+    }
+    inference te ⊢ NegNum[n]: constatant
     {
     }
     inference te ⊢ True: constatant
@@ -355,10 +360,18 @@ language KKJ
   }
   function 〚Constant〛: #List<IToken># → #List<IToken>#
   {
-    equation 〚Num[n]〛(ve) = ve0
+    equation 〚PosNum[n]〛(ve) = ve0
     {
       #
         ve.add(new IntToken(Integer.valueOf(n)));
+      #
+      ve0 = ve;
+    }
+    after  {# System.out.println("TokensList: " + ve.toString()); #}
+    equation 〚NegNum[n]〛(ve) = ve0
+    {
+      #
+        ve.add(new IntToken(-1*Integer.valueOf(n)));
       #
       ve0 = ve;
     }

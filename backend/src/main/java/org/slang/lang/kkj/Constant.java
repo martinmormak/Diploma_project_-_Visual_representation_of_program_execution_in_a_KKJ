@@ -13,9 +13,19 @@
       import static org.slang.lang.kkj.KKJ.*;
     
 public sealed interface Constant permits
-Constant.Num, Constant.True, Constant.False
+Constant.PosNum, Constant.NegNum, Constant.True, Constant.False
 {
-  public record Num(String _1) implements Constant
+  public record PosNum(String _1) implements Constant
+  {
+    public String toString()
+    {
+      var n = _1;
+      String _result;
+       _result = n; 
+      return _result;
+    }
+  }
+  public record NegNum(String _1) implements Constant
   {
     public String toString()
     {

@@ -30,13 +30,26 @@ public final class Constant_
   {
     switch (_phrase)
     {
-      case Constant.Num(var n) ->
+      case Constant.PosNum(var n) ->
       {
         return (_Operation)(var ve) -> 
         {
           List<IToken> ve0;
           
         ve.add(new IntToken(Integer.valueOf(n)));
+      
+          ve0 = ve;
+           System.out.println("TokensList: " + ve.toString()); 
+          return ve0;
+        };
+      }
+      case Constant.NegNum(var n) ->
+      {
+        return (_Operation)(var ve) -> 
+        {
+          List<IToken> ve0;
+          
+        ve.add(new IntToken(-1*Integer.valueOf(n)));
       
           ve0 = ve;
            System.out.println("TokensList: " + ve.toString()); 
