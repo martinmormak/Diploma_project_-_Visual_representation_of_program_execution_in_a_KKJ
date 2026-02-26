@@ -9,7 +9,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.*;
 
-public class KKJMain {
+public class  KKJMain {
     private static final ConfigReader configReader = new ConfigReader();
 
     public static void main(String[] args) {
