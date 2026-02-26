@@ -181,8 +181,9 @@ function App() {
             if (response.ok === true) {
                 await runProgramFromScratch();
             } else {
-                console.log(response);
-                setOutput([{ tokens: ["ERROR"], stack: ["validateProgram(): Network response was not ok."] }]);
+
+                const errorText = await response.text();
+                setOutput([{ tokens: ["ERROR"], stack: [errorText] }]);
                 setVisibleLines(1);
             }
         } catch (error) {
@@ -223,15 +224,15 @@ function App() {
             if (response.ok) {
                 const data = await response.json();
                 setOutput(prev => [...prev, ...data]);
-                setVisibleLines(n  => n + 1);
+                setVisibleLines(n => n + 1);
             } else {
                 const errorText = await response.text();
-                setOutput([{ tokens: ["ERROR"], stack: [errorText] }]);
-                setVisibleLines(1)
+                setOutput(prev => [...prev, { tokens: ["ERROR"], stack: [errorText] }]);
+                setVisibleLines(n => n + 1);
             }
         } catch (error) {
-            setOutput([{ tokens: ["ERROR"], stack: [error.message] }]);
-            setVisibleLines(1);
+            setOutput(prev => [...prev, { tokens: ["ERROR"], stack: [error.message] }]);
+            setVisibleLines(n => n + 1);
         }
     }
 
