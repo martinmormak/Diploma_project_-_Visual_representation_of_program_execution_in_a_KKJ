@@ -3,6 +3,7 @@ package org.core.tokens.functions;
 import org.core.tokens.interfaces.IFunctionToken;
 import org.core.tokens.interfaces.IToken;
 import org.core.tokens.quotation.CompositionToken;
+import org.slang.KKJException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,10 +22,10 @@ public class ComposeToken implements IToken {
                 stack.push(new CompositionToken(tokens));
                 return null;
             } else {
-                throw new RuntimeException("Expected IFunctionToken, IFunctionToken and get " + pop2.getClass().getSimpleName() + ", " + pop1.getClass().getSimpleName());
+                throw new KKJException("Expected IFunctionToken, IFunctionToken and get " + pop2.getClass().getSimpleName() + ", " + pop1.getClass().getSimpleName());
             }
         } else {
-            throw new RuntimeException("In stack must be >= 2 items and is " + (stack.isEmpty() ? "empty" : stack.size()));
+            throw new KKJException("In stack must be >= 2 items and is " + (stack.isEmpty() ? "empty" : stack.size()));
         }
     }
 

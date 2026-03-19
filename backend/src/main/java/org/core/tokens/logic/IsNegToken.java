@@ -4,6 +4,7 @@ import org.core.tokens.constant.BoolToken;
 import org.core.tokens.constant.IntToken;
 import org.core.tokens.interfaces.IFunctionToken;
 import org.core.tokens.interfaces.IToken;
+import org.slang.KKJException;
 
 import java.util.List;
 import java.util.Stack;
@@ -18,10 +19,10 @@ public class IsNegToken implements IFunctionToken {
                 IToken result = new BoolToken(((IntToken) pop).getValue() < 0);
                 stack.push(result);
             } else {
-                throw new RuntimeException("Expected IntToken and get " + pop.getClass().getSimpleName());
+                throw new KKJException("Expected IntToken and get " + pop.getClass().getSimpleName());
             }
         } else {
-            throw new RuntimeException("In stack must be >= 1 items and is empty");
+            throw new KKJException("In stack must be >= 1 items and is empty");
         }
         return null;
     }

@@ -3,6 +3,7 @@ package org.core.tokens.logic;
 import org.core.tokens.constant.BoolToken;
 import org.core.tokens.interfaces.IFunctionToken;
 import org.core.tokens.interfaces.IToken;
+import org.slang.KKJException;
 
 import java.util.List;
 import java.util.Stack;
@@ -18,10 +19,10 @@ public class AndToken implements IFunctionToken {
                 IToken result = new BoolToken(((BoolToken) pop2).getValue() && ((BoolToken) pop1).getValue());
                 stack.push(result);
             } else {
-                throw new RuntimeException("Expected BoolToken, BoolToken and get " + pop2.getClass().getSimpleName() + ", " + pop1.getClass().getSimpleName());
+                throw new KKJException("Expected BoolToken, BoolToken and get " + pop2.getClass().getSimpleName() + ", " + pop1.getClass().getSimpleName());
             }
         } else {
-            throw new RuntimeException("In stack must be >= 2 items and is " + (stack.isEmpty() ? "empty" : stack.size()));
+            throw new KKJException("In stack must be >= 2 items and is " + (stack.isEmpty() ? "empty" : stack.size()));
         }
         return null;
     }

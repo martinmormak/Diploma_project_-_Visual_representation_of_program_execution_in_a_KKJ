@@ -4,6 +4,7 @@ import org.core.tokens.interfaces.IFunctionToken;
 import org.core.tokens.interfaces.IToken;
 import org.core.tokens.quotation.CombinationToken;
 import org.core.tokens.quotation.CompositionToken;
+import org.slang.KKJException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,10 +23,10 @@ public class ApplyToken implements IToken {
                 }
                 return new LinkedList<>(List.of(pop1));
             } else {
-                throw new RuntimeException("Expected IFunctionToken and get " + pop1.getClass().getSimpleName());
+                throw new KKJException("Expected IFunctionToken and get " + pop1.getClass().getSimpleName());
             }
         } else {
-            throw new RuntimeException("In stack must be >= 1 items and is empty");
+            throw new KKJException("In stack must be >= 1 items and is empty");
         }
     }
 

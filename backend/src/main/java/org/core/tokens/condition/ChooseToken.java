@@ -3,6 +3,7 @@ package org.core.tokens.condition;
 import org.core.tokens.constant.BoolToken;
 import org.core.tokens.interfaces.IFunctionToken;
 import org.core.tokens.interfaces.IToken;
+import org.slang.KKJException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,10 +30,10 @@ public class ChooseToken implements IFunctionToken {
                     return new LinkedList<>();
                 }
             } else {
-                throw new RuntimeException("Condition must be BoolToken and is " + condition.getClass().getSimpleName());
+                throw new KKJException("Condition must be BoolToken and is " + condition.getClass().getSimpleName());
             }
         } else {
-            throw new RuntimeException("In stack must be >= 3 items and is empty");
+            throw new KKJException("In stack must be >= 3 items and is empty");
         }
     }
 

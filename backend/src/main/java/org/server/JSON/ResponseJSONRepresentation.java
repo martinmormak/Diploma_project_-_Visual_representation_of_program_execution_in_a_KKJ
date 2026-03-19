@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-public class JSONRepresentation {
+public class ResponseJSONRepresentation {
     List<IToken> tokens;
     Stack<IToken> stack;
 
-    public JSONRepresentation(List<IToken> tokens) {
+    public ResponseJSONRepresentation(List<IToken> tokens) {
         this.tokens = new LinkedList<>();
         for (IToken token : tokens) {
             this.tokens.add(token.clone());
@@ -19,7 +19,7 @@ public class JSONRepresentation {
         this.stack = new Stack<>();
     }
 
-    public JSONRepresentation(List<IToken> newTokens, List<IToken> tokens, Stack<IToken> stack) {
+    public ResponseJSONRepresentation(List<IToken> newTokens, List<IToken> tokens, Stack<IToken> stack) {
         this.tokens = new LinkedList<>();
         for (IToken token : newTokens) {
             this.tokens.add(token.clone());

@@ -2,6 +2,7 @@ package org.core.tokens.stack;
 
 import org.core.tokens.interfaces.IFunctionToken;
 import org.core.tokens.interfaces.IToken;
+import org.slang.KKJException;
 
 import java.util.List;
 import java.util.Stack;
@@ -18,7 +19,7 @@ public class RotlToken implements IFunctionToken {
             stack.push(pop1);
             stack.push(pop3);
         } else {
-            throw new RuntimeException("In stack must be >= 3 items and is " + (stack.isEmpty() ? "empty" : stack.size()));
+            throw new KKJException("In stack must be >= 3 items and is " + (stack.isEmpty() ? "empty" : stack.size()));
         }
         return null;
     }

@@ -168,13 +168,13 @@ function App() {
     async function validateProgram() {
         try {
             const response = await fetch(
-                backendURL+`/api/v1/validate/${encodeURIComponent(program)}`,
+                backendURL+`/api/v1/validate`,
                 {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ input: program }),
+                    body: JSON.stringify({ tokensValue: program }),
                 }
             );
 
@@ -195,8 +195,16 @@ function App() {
     async function runProgramFromScratch() {
         try {
             const response = await fetch(
-                backendURL + `/api/v1/simulate/${encodeURIComponent(program)}`,
-                { method: "GET" }
+                backendURL + `/api/v1/simulate/from-scratch`,
+                {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            tokensValue: program
+                        }),
+                    }
             );
 
             if (response.ok) {
@@ -217,8 +225,17 @@ function App() {
     async function runProgramFromPoint(tokens, stack) {
         try {
             const response = await fetch(
-                backendURL + `/api/v1/simulate/${encodeURIComponent(tokens)}/${encodeURIComponent(stack)}`,
-                { method: "GET" }
+                backendURL + `/api/v1/simulate/from-point`,
+                {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            tokensValue: tokens,
+                            stackValue: stack
+                        }),
+                    }
             );
 
             if (response.ok) {

@@ -4,6 +4,7 @@ import org.core.tokens.interfaces.IFunctionToken;
 import org.core.tokens.interfaces.IToken;
 import org.core.tokens.quotation.CombinationToken;
 import org.core.tokens.quotation.QuotationToken;
+import org.slang.KKJException;
 
 import java.util.*;
 
@@ -36,7 +37,7 @@ public class WhileToken implements IFunctionToken {
             )))));
             return new LinkedList<>(List.of(new ConditionToken(condition, loopBranch, List.of(new IDToken()))));
         } else {
-            throw new RuntimeException("In stack must be >= 2 items and is empty");
+            throw new KKJException("In stack must be >= 2 items and is empty");
         }
     }
 

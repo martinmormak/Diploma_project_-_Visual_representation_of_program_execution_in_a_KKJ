@@ -21,6 +21,7 @@ import org.core.tokens.logic.NotToken;
 import org.core.tokens.quotation.CombinationToken;
 import org.core.tokens.quotation.QuotationToken;
 import org.core.tokens.stack.*;
+import org.slang.KKJException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -160,11 +161,11 @@ public class Tokenizer {
                 tokenList.addAll(0, programs.removeLast());
                 parentheses--;
             } else {
-                throw new RuntimeException(tokenList.toString());
+                throw new KKJException(tokenList.toString());
             }
         }
         if(parentheses != 0 || brackets != 0 || braces != 0 || pipes != 0) {
-            throw new RuntimeException(tokenList.toString());
+            throw new KKJException(tokenList.toString());
         }
         return tokenList;
     }
@@ -193,7 +194,7 @@ public class Tokenizer {
                 }
                 stringBuilder.deleteCharAt(stringBuilder.length()-1);
                 stringBuilder.deleteCharAt(stringBuilder.length()-1);
-                throw new RuntimeException(stringBuilder.toString());
+                throw new KKJException(stringBuilder.toString());
             }
             classIndex--;
             if(classIndex<0){

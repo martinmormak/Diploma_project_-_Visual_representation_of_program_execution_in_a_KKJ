@@ -3,6 +3,7 @@ package org.core.tokens.condition;
 import org.core.tokens.constant.BoolToken;
 import org.core.tokens.interfaces.IFunctionToken;
 import org.core.tokens.interfaces.IToken;
+import org.slang.KKJException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class ConditionToken implements IFunctionToken {
                 return falseBranch;
             }
         } else {
-            throw new RuntimeException("Expected BoolToken and get " + stack.peek().getClass().getSimpleName());
+            throw new KKJException("Expected BoolToken and get " + stack.peek().getClass().getSimpleName());
         }
     }
 

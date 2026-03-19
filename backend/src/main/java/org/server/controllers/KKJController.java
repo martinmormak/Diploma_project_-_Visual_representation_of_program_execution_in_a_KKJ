@@ -3,7 +3,9 @@ package org.server.controllers;
 import org.StringProcessor;
 import org.core.Tokenizer;
 import org.core.tokens.interfaces.IToken;
-import org.server.JSON.JSONRepresentation;
+import org.server.JSON.RequestJSONRepresentation;
+import org.server.JSON.ResponseJSONRepresentation;
+import org.slang.KKJException;
 import org.slang.lang.kkj.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,85 +20,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1")
 public class KKJController {
 
-    @PostMapping("/validate/{value}")
-    public ResponseEntity<String> validateInput(@PathVariable("value") String value) {
+    @PostMapping("/validate")
+    public ResponseEntity<String> validateInput(@RequestBody RequestJSONRepresentation request) {
         System.out.println("---------- validateInput ----------");
-        if(value==null){
-            return new ResponseEntity<>("Input is empty", HttpStatus.BAD_REQUEST);
+        if (request.getTokensValue() == null || request.getTokensValue().isEmpty()) {
+            return new ResponseEntity<>("Tokens input is empty", HttpStatus.BAD_REQUEST);
         }
-        System.out.println("From API input: " + value);
-
-        // replace commands sing map
-        value = StringProcessor.replaceByPatterns(value);
-        System.out.println("After map replacing: " + value);
-
-        // Apply POPn replacements
-        value = StringProcessor.replacePopOccurrences(value);
-        System.out.println("After pop replacing: " + value);
-
-        // Apply toUpperCase replacements
-        value = value.toUpperCase();
-        System.out.println("After to upper case replacing: " + value);
-
-        try {
-            Program program = KKJ_parser.parseProgram(value);
-            System.out.println(program);
-            Program_program.operation(program).apply();
-            Program_.operation(program).apply();
-            System.out.println("------------------------------\n");
-        } catch (Exception e) {
-            System.out.println("------------------------------\n");
-            return new ResponseEntity<>("Input is invalid with error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>("Input is valid", HttpStatus.OK);
-    }
-
-    @GetMapping("/simulate/{value}")
-    public ResponseEntity<String> getSimulationFromScratch(@PathVariable("value") String value) {
-        System.out.println("---------- getSimulationFromScratch ----------");
-        if(value==null){
-            return new ResponseEntity<>("Input is empty", HttpStatus.BAD_REQUEST);
-        }
-        System.out.println("From API input: " + value);
-
-        // replace commands sing map
-        value = StringProcessor.replaceByPatterns(value);
-        System.out.println("After map replacing: " + value);
-
-        // Apply POPn replacements
-        value = StringProcessor.replacePopOccurrences(value);
-        System.out.println("After pop replacing: " + value);
-
-        // Apply toUpperCase replacements
-        value = value.toUpperCase();
-        System.out.println("After to upper case replacing: " + value);
-
-        List<JSONRepresentation> jsonRepresentationList = new LinkedList<>();
-        try {
-            Program program = KKJ_parser.parseProgram(value);
-            System.out.println(program);
-            Program_program.operation(program).apply();
-            List<IToken> tokens = Program_.operation(program).apply();
-            System.out.println("------------------------------\n");
-
-            jsonRepresentationList.add(new JSONRepresentation(tokens));
-            Stack<IToken> stack = new Stack<>();
-
-            jsonRepresentationList.addAll(simulate(tokens, stack));
-        } catch (Exception e) {
-            System.out.println("------------------------------\n");
-            return new ResponseEntity<>("Input is invalid, simulation failed.", HttpStatus.BAD_REQUEST);
-        }
-        ResponseEntity<String> response = new ResponseEntity<>(toJsonArray(jsonRepresentationList), HttpStatus.OK);
-        return response;
-    }
-
-    @GetMapping("/simulate/{tokensValue}/{stackValue}")
-    public ResponseEntity<String> getSimulationFromPoint(@PathVariable("tokensValue") String tokensValue, @PathVariable("stackValue") String stackValue) {
-        System.out.println("---------- getSimulationFromPoint ----------");
-        if(tokensValue==null){
-            return new ResponseEntity<>("Input is empty", HttpStatus.BAD_REQUEST);
-        }
+        String tokensValue = request.getTokensValue();
         System.out.println("From API input: " + tokensValue);
 
         // replace commands sing map
@@ -111,7 +41,89 @@ public class KKJController {
         tokensValue = tokensValue.toUpperCase();
         System.out.println("After to upper case replacing: " + tokensValue);
 
-        List<JSONRepresentation> jsonRepresentationList;
+        try {
+            Program program = KKJ_parser.parseProgram(tokensValue);
+            System.out.println(program);
+            Program_program.operation(program).apply();
+            Program_.operation(program).apply();
+            System.out.println("------------------------------\n");
+        } catch (KKJException e) {
+            System.out.println("------------------------------\n");
+            return new ResponseEntity<>("Input is invalid with error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            System.out.println("------------------------------\n");
+            return new ResponseEntity<>("Unknow error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("Input is valid", HttpStatus.OK);
+    }
+
+    @PostMapping("/simulate/from-scratch")
+    public ResponseEntity<String> getSimulationFromScratch(@RequestBody RequestJSONRepresentation request) {
+        System.out.println("---------- getSimulationFromScratch ----------");
+        if (request.getTokensValue() == null || request.getTokensValue().isEmpty()) {
+            return new ResponseEntity<>("Tokens input is empty", HttpStatus.BAD_REQUEST);
+        }
+        String tokensValue = request.getTokensValue();
+        System.out.println("From API input: " + tokensValue);
+
+        // replace commands sing map
+        tokensValue = StringProcessor.replaceByPatterns(tokensValue);
+        System.out.println("After map replacing: " + tokensValue);
+
+        // Apply POPn replacements
+        tokensValue = StringProcessor.replacePopOccurrences(tokensValue);
+        System.out.println("After pop replacing: " + tokensValue);
+
+        // Apply toUpperCase replacements
+        tokensValue = tokensValue.toUpperCase();
+        System.out.println("After to upper case replacing: " + tokensValue);
+
+        List<ResponseJSONRepresentation> responseJsonRepresentationList = new LinkedList<>();
+        try {
+            Program program = KKJ_parser.parseProgram(tokensValue);
+            System.out.println(program);
+            Program_program.operation(program).apply();
+            List<IToken> tokens = Program_.operation(program).apply();
+            System.out.println("------------------------------\n");
+
+            responseJsonRepresentationList.add(new ResponseJSONRepresentation(tokens));
+            Stack<IToken> stack = new Stack<>();
+
+            responseJsonRepresentationList.addAll(simulate(tokens, stack));
+        } catch (KKJException e) {
+            System.out.println("------------------------------\n");
+            return new ResponseEntity<>("Input is invalid, simulation failed.", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            System.out.println("------------------------------\n");
+            return new ResponseEntity<>("Unknow error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        ResponseEntity<String> response = new ResponseEntity<>(toJsonArray(responseJsonRepresentationList), HttpStatus.OK);
+        return response;
+    }
+
+    @PostMapping("/simulate/from-point")
+    public ResponseEntity<String> getSimulationFromPoint(@RequestBody RequestJSONRepresentation request) {
+        System.out.println("---------- getSimulationFromPoint ----------");
+        if (request.getTokensValue() == null || request.getTokensValue().isEmpty() || request.getStackValue() == null || request.getStackValue().isEmpty()) {
+            return new ResponseEntity<>("Tokens input or Stack input is empty", HttpStatus.BAD_REQUEST);
+        }
+        String tokensValue = request.getTokensValue();
+        String stackValue = request.getStackValue();
+        System.out.println("From API input: " + tokensValue);
+
+        // replace commands sing map
+        tokensValue = StringProcessor.replaceByPatterns(tokensValue);
+        System.out.println("After map replacing: " + tokensValue);
+
+        // Apply POPn replacements
+        tokensValue = StringProcessor.replacePopOccurrences(tokensValue);
+        System.out.println("After pop replacing: " + tokensValue);
+
+        // Apply toUpperCase replacements
+        tokensValue = tokensValue.toUpperCase();
+        System.out.println("After to upper case replacing: " + tokensValue);
+
+        List<ResponseJSONRepresentation> responseJsonRepresentationList;
         Tokenizer tokenizer = new Tokenizer();
         try {
             List<IToken> tokens = tokenizer.getTokenList(tokensValue);
@@ -124,17 +136,20 @@ public class KKJController {
             }
             System.out.println("------------------------------\n");
 
-            jsonRepresentationList = simulate(tokens, stack);
-        } catch (Exception e) {
+            responseJsonRepresentationList = simulate(tokens, stack);
+        } catch (KKJException e) {
             System.out.println("------------------------------\n");
             return new ResponseEntity<>("Input is invalid, simulation failed.", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            System.out.println("------------------------------\n");
+            return new ResponseEntity<>("Unknow error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        ResponseEntity<String> response = new ResponseEntity<>(toJsonArray(jsonRepresentationList), HttpStatus.OK);
+        ResponseEntity<String> response = new ResponseEntity<>(toJsonArray(responseJsonRepresentationList), HttpStatus.OK);
         return response;
     }
 
-    private List<JSONRepresentation> simulate (List<IToken> tokens, Stack<IToken> stack) {
-            List<JSONRepresentation> jsonRepresentationList = new LinkedList<>();
+    private List<ResponseJSONRepresentation> simulate (List<IToken> tokens, Stack<IToken> stack) {
+            List<ResponseJSONRepresentation> responseJsonRepresentationList = new LinkedList<>();
             int counter = 0;
             while (!tokens.isEmpty() && counter < 50) {
                 IToken token = tokens.removeFirst();
@@ -149,8 +164,8 @@ public class KKJController {
                         newTokens.removeLast();
                     }
 
-                    jsonRepresentationList.add(new JSONRepresentation(newTokens, tokens, stack));
-                    System.out.println(jsonRepresentationList.getLast());
+                    responseJsonRepresentationList.add(new ResponseJSONRepresentation(newTokens, tokens, stack));
+                    System.out.println(responseJsonRepresentationList.getLast());
                     counter++;
 
                     for (IToken iToken : newTokens) {
@@ -173,12 +188,12 @@ public class KKJController {
                 }
             }
             System.out.println("------------------------------\n");
-        return jsonRepresentationList;
+        return responseJsonRepresentationList;
     }
 
-    private String toJsonArray(List<JSONRepresentation> list) {
+    private String toJsonArray(List<ResponseJSONRepresentation> list) {
         return list.stream()
-                .map(JSONRepresentation::toJson)
+                .map(ResponseJSONRepresentation::toJson)
                 .collect(Collectors.joining(",\n", "[", "]"));
     }
 }
