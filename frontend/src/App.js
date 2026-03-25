@@ -6,6 +6,7 @@ function App() {
     const [program, setProgram] = useState('');
     const [output, setOutput] = useState([]);
     const [visibleLines, setVisibleLines] = useState(0);
+    const [showHelp, setShowHelp] = useState(false);
     const fileInputRef = useRef(null);
     const tableWrapperRef = useRef(null);
 
@@ -99,7 +100,8 @@ function App() {
         element.click();
     }
 
-    function loadFromFile(event) {const file = event.target.files[0];
+    function loadFromFile(event) {
+        const file = event.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
@@ -137,7 +139,7 @@ function App() {
             .join("\n");
 
         const element = document.createElement("a");
-        const file = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const file = new Blob([csv], {type: "text/csv;charset=utf-8;"});
 
         element.href = URL.createObjectURL(file);
         element.download = "kkjTable.csv";
@@ -168,13 +170,13 @@ function App() {
     async function validateProgram() {
         try {
             const response = await fetch(
-                backendURL+`/api/v1/validate`,
+                backendURL + `/api/v1/validate`,
                 {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ tokensValue: program }),
+                    body: JSON.stringify({tokensValue: program}),
                 }
             );
 
@@ -183,11 +185,11 @@ function App() {
             } else {
 
                 const errorText = await response.text();
-                setOutput([{ tokens: ["ERROR"], stack: [errorText] }]);
+                setOutput([{tokens: ["ERROR"], stack: [errorText]}]);
                 setVisibleLines(1);
             }
         } catch (error) {
-            setOutput([{ tokens: ["ERROR"], stack: [error.message] }]);
+            setOutput([{tokens: ["ERROR"], stack: [error.message]}]);
             setVisibleLines(1);
         }
     }
@@ -197,14 +199,14 @@ function App() {
             const response = await fetch(
                 backendURL + `/api/v1/simulate/from-scratch`,
                 {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            tokensValue: program
-                        }),
-                    }
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        tokensValue: program
+                    }),
+                }
             );
 
             if (response.ok) {
@@ -213,11 +215,11 @@ function App() {
                 setVisibleLines(1);
             } else {
                 const errorText = await response.text();
-                setOutput([{ tokens: ["ERROR"], stack: [errorText] }]);
+                setOutput([{tokens: ["ERROR"], stack: [errorText]}]);
                 setVisibleLines(1)
             }
         } catch (error) {
-            setOutput([{ tokens: ["ERROR"], stack: [error.message] }]);
+            setOutput([{tokens: ["ERROR"], stack: [error.message]}]);
             setVisibleLines(1);
         }
     }
@@ -227,15 +229,15 @@ function App() {
             const response = await fetch(
                 backendURL + `/api/v1/simulate/from-point`,
                 {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            tokensValue: tokens,
-                            stackValue: stack
-                        }),
-                    }
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        tokensValue: tokens,
+                        stackValue: stack
+                    }),
+                }
             );
 
             if (response.ok) {
@@ -244,16 +246,16 @@ function App() {
                 setVisibleLines(n => n + 1);
             } else {
                 const errorText = await response.text();
-                setOutput(prev => [...prev, { tokens: ["ERROR"], stack: [errorText] }]);
+                setOutput(prev => [...prev, {tokens: ["ERROR"], stack: [errorText]}]);
                 setVisibleLines(n => n + 1);
             }
         } catch (error) {
-            setOutput(prev => [...prev, { tokens: ["ERROR"], stack: [error.message] }]);
+            setOutput(prev => [...prev, {tokens: ["ERROR"], stack: [error.message]}]);
             setVisibleLines(n => n + 1);
         }
     }
 
-    function OutputTable({ data, visibleLines }) {
+    function OutputTable({data, visibleLines}) {
         const rows = data.slice(0, visibleLines);
 
         return (
@@ -269,25 +271,37 @@ function App() {
                     const isError = row.tokens.includes("ERROR");
 
                     return (
-                    <tr key={index}>
-                        <td>
+                        <tr key={index}>
+                            <td>
                             <pre>
                                 {row.tokens.join(" ")}
                             </pre>
-                        </td>
-                        <td>
+                            </td>
+                            <td>
                             <pre>
                                 {isError
                                     ? row.stack.join("\n")
                                     : row.stack.map((v) => `[s${index}] ${v}`).join("\n")}
                             </pre>
-                        </td>
-                    </tr>
-                    )})}
+                            </td>
+                        </tr>
+                    )
+                })}
                 </tbody>
             </table>
         );
     }
+
+    useEffect(() => {
+        function handleClickOutside(e) {
+            if (!e.target.closest('.textarea-wrapper')) {
+                setShowHelp(false);
+            }
+        }
+
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, []);
 
     return (
         <div className="App">
@@ -304,12 +318,61 @@ function App() {
                             </option>
                         ))}
                     </select>
-                    <textarea
-                        id="user-input"
-                        placeholder="Write your program here..."
-                        value={program}
-                        onChange={handleInputChange}
-                    ></textarea>
+                    <div className="textarea-wrapper">
+                        <textarea
+                            id="user-input"
+                            placeholder="Write your program here..."
+                            value={program}
+                            onChange={handleInputChange}
+                        />
+
+                        <div
+                            className="help-icon"
+                            onClick={() => setShowHelp(prev => !prev)}
+                        >
+                            ?
+                        </div>
+
+                        {showHelp && (
+                            <div className="help-popup">
+                                <strong>KKJ Commands</strong>
+
+                                <ul>
+                                    <li><b>ADD</b> – add top two numbers</li>
+                                    <li><b>SUB</b> – subtract second from top</li>
+                                    <li><b>MUL</b> – multiply top two numbers</li>
+                                    <li><b>CMP</b> – compare top two numbers</li>
+
+                                    <li><b>NOT</b> – </li>
+                                    <li><b>AND</b> – </li>
+                                    <li><b>ISNEG</b> – check if value is negative</li>
+                                    <li><b>ISPOS</b> – check if value is positive</li>
+
+                                    <li><b>CLEAR</b> – clear stack</li>
+                                    <li><b>OVER</b> – duplicate second top value to the top</li>
+                                    <li><b>POP</b> – remove top value</li>
+                                    <li><b>DUP</b> – duplicate top of stack</li>
+                                    <li><b>SWAP</b> – swap top two values</li>
+                                    <li><b>ROTL</b> – move third top value to the top</li>
+                                    <li><b>ID</b> – identity (used when rewrite while to the condition)</li>
+
+                                    <li><b>{`{ ... }`}</b> – quotation (block of code) push it to the top</li>
+                                    <li><b>APPLY</b> – execute quotation saved on the top position</li>
+                                    <li><b>APPLYOVER</b> – execute quotation saved on the second top position</li>
+                                    <li><b>COMPOSE</b> – combine two quotations</li>
+
+                                    <li><b>CHOOSE</b> – choose between two values</li>
+
+                                    <li><b>WHILE</b> – loop (condition + body)</li>
+                                </ul>
+
+                                <hr />
+
+                                <p><b>Example:</b></p>
+                                <code>3 4 add → 7</code>
+                            </div>
+                        )}
+                    </div>
                     <div className="input-buttons">
                         <button onClick={validateProgram}>Run</button>
                         <button onClick={saveToFile}>Save program to file</button>
@@ -319,7 +382,7 @@ function App() {
                         type="file"
                         accept=".txt"
                         ref={fileInputRef}
-                        style={{ display: "none" }}
+                        style={{display: "none"}}
                         onChange={loadFromFile}
                     />
                 </div>
