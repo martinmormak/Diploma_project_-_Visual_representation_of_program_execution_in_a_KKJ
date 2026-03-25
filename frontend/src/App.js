@@ -1,99 +1,49 @@
 import './App.css';
-import {useState, useRef, useEffect} from "react";
+import { useState, useRef, useEffect } from "react";
+
+import OutputTable from "./components/OutputTable";
+import HelpPopup from "./components/HelpPopup";
+import ExampleSelector from "./components/ExampleSelector";
+
+import {
+    validate,
+    simulateFromScratch,
+    simulateFromPoint
+} from "./services/api";
 
 function App() {
-    const backendURL = process.env.REACT_APP_BACKEND_URL;
     const [program, setProgram] = useState('');
     const [output, setOutput] = useState([]);
     const [visibleLines, setVisibleLines] = useState(0);
     const [showHelp, setShowHelp] = useState(false);
+
     const fileInputRef = useRef(null);
     const tableWrapperRef = useRef(null);
 
     const examples = [
-        {
-            label: "— Select an example —",
-            value: ""
-        },
-
-        {
-            label: "Example 1: Simple arithmetic",
-            value: "3 4 add"
-        },
-
-        {
-            label: "Example 2: Arithmetic + stack ops",
-            value: "3 4 add dup mul"
-        },
-
-        {
-            label: "Example 3: Using stack manipulation",
-            value: "5 6 swap sub"
-        },
-        {
-            label: "Example 4: Conditional choose",
-            value: "0 ispos 5 6 choose"
-        },
-
-        {
-            label: "Example 5: Composition with quotations",
-            value: "14 {dup dup} {add add} compose apply"
-        },
-
-        {
-            label: "Example 6: Invalid program (stack underflow)",
-            value: "1 add"
-        },
-
-        {
-            label: "Example 7: Countdown with while",
-            value: "5 {dup 0 gt} {dup 1 sub} while"
-        },
-
-        {
-            label: "Example 8: Factorial (iterative)",
-            value: "5 1 swap {dup 1 gt} {swap over mul swap 1 sub} while pop"
-        },
-
-        {
-            label: "Example 9: Sum from N down to 1",
-            value: "5 0 swap {dup 0 gt} {swap over add swap 1 sub} while pop"
-        },
-
-        {
-            label: "Example 10: Double until > 100",
-            value: "1 {dup 100 lt} {dup add} while"
-        },
-
-        {
-            label: "Example 11: Nested while",
-            value: "3 {dup 0 gt} {2 {dup 0 gt} {1 sub} while 1 sub} while"
-        },
-
-        {
-            label: "Example 12: Infinite loop (logical error)",
-            value: "1 {dup 0 gt} {dup} while"
-        },
-
-        {
-            label: "Example 13: Invalid while (missing quotation)",
-            value: "5 dup 0 gt {1 sub} while"
-        }
+        { label: "— Select an example —", value: "" },
+        { label: "Example 1: Simple arithmetic", value: "3 4 add" },
+        { label: "Example 2: Arithmetic + stack ops", value: "3 4 add dup mul" },
+        { label: "Example 3: Using stack manipulation", value: "5 6 swap sub" },
+        { label: "Example 4: Conditional choose", value: "0 ispos 5 6 choose" },
+        { label: "Example 5: Composition with quotations", value: "14 {dup dup} {add add} compose apply" },
+        { label: "Example 6: Invalid program (stack underflow)", value: "1 add" },
+        { label: "Example 7: Countdown with while", value: "5 {dup 0 gt} {dup 1 sub} while" },
+        { label: "Example 8: Factorial (iterative)", value: "5 1 swap {dup 1 gt} {swap over mul swap 1 sub} while pop" },
+        { label: "Example 9: Sum from N down to 1", value: "5 0 swap {dup 0 gt} {swap over add swap 1 sub} while pop" },
+        { label: "Example 10: Double until > 100", value: "1 {dup 100 lt} {dup add} while" },
+        { label: "Example 11: Nested while", value: "3 {dup 0 gt} {2 {dup 0 gt} {1 sub} while 1 sub} while" },
+        { label: "Example 12: Infinite loop (logical error)", value: "1 {dup 0 gt} {dup} while" },
+        { label: "Example 13: Invalid while (missing quotation)", value: "5 dup 0 gt {1 sub} while" }
     ];
 
-    async function handleInputChange(event) {
-        setProgram(event.target.value);
-    }
-
-    async function handleExampleChange(event) {
+    function handleInputChange(event) {
         setProgram(event.target.value);
     }
 
     function saveToFile() {
         const element = document.createElement("a");
-        const file = new Blob([program], {
-            type: "text/plain"
-        });
+        const file = new Blob([program], { type: "text/plain" });
         element.href = URL.createObjectURL(file);
         element.download = "kkjProgram.txt";
         document.body.appendChild(element);
@@ -110,7 +60,6 @@ function App() {
         };
         reader.readAsText(file);
 
-        // allow loading the same file again
         event.target.value = null;
     }
 
@@ -125,12 +74,10 @@ function App() {
 
     function exportTableToFile() {
         const csv = [
-            ["Tokens", "Stack"], // header row
+            ["Tokens", "Stack"],
             ...output.map((row, rowIndex) => [
                 row.tokens.join(" "),
-                row.stack
-                    .map(value => `[s${rowIndex}] ${value}`)
-                    .join(" | ")
+                row.stack.map(value => `[s${rowIndex}] ${value}`).join(" | ")
             ])
         ]
             .map(row =>
@@ -139,7 +86,7 @@ function App() {
             .join("\n");
 
         const element = document.createElement("a");
-        const file = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+        const file = new Blob([csv], { type: "text/csv;charset=utf-8;" });
 
         element.href = URL.createObjectURL(file);
         element.download = "kkjTable.csv";
@@ -169,45 +116,24 @@ function App() {
 
     async function validateProgram() {
         try {
-            const response = await fetch(
-                backendURL + `/api/v1/validate`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({tokensValue: program}),
-                }
-            );
+            const response = await validate(program);
 
-            if (response.ok === true) {
+            if (response.ok) {
                 await runProgramFromScratch();
             } else {
-
                 const errorText = await response.text();
-                setOutput([{tokens: ["ERROR"], stack: [errorText]}]);
+                setOutput([{ tokens: ["ERROR"], stack: [errorText] }]);
                 setVisibleLines(1);
             }
         } catch (error) {
-            setOutput([{tokens: ["ERROR"], stack: [error.message]}]);
+            setOutput([{ tokens: ["ERROR"], stack: [error.message] }]);
             setVisibleLines(1);
         }
     }
 
     async function runProgramFromScratch() {
         try {
-            const response = await fetch(
-                backendURL + `/api/v1/simulate/from-scratch`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        tokensValue: program
-                    }),
-                }
-            );
+            const response = await simulateFromScratch(program);
 
             if (response.ok) {
                 const data = await response.json();
@@ -215,30 +141,18 @@ function App() {
                 setVisibleLines(1);
             } else {
                 const errorText = await response.text();
-                setOutput([{tokens: ["ERROR"], stack: [errorText]}]);
-                setVisibleLines(1)
+                setOutput([{ tokens: ["ERROR"], stack: [errorText] }]);
+                setVisibleLines(1);
             }
         } catch (error) {
-            setOutput([{tokens: ["ERROR"], stack: [error.message]}]);
+            setOutput([{ tokens: ["ERROR"], stack: [error.message] }]);
             setVisibleLines(1);
         }
     }
 
     async function runProgramFromPoint(tokens, stack) {
         try {
-            const response = await fetch(
-                backendURL + `/api/v1/simulate/from-point`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        tokensValue: tokens,
-                        stackValue: stack
-                    }),
-                }
-            );
+            const response = await simulateFromPoint(tokens, stack);
 
             if (response.ok) {
                 const data = await response.json();
@@ -246,50 +160,13 @@ function App() {
                 setVisibleLines(n => n + 1);
             } else {
                 const errorText = await response.text();
-                setOutput(prev => [...prev, {tokens: ["ERROR"], stack: [errorText]}]);
+                setOutput(prev => [...prev, { tokens: ["ERROR"], stack: [errorText] }]);
                 setVisibleLines(n => n + 1);
             }
         } catch (error) {
-            setOutput(prev => [...prev, {tokens: ["ERROR"], stack: [error.message]}]);
+            setOutput(prev => [...prev, { tokens: ["ERROR"], stack: [error.message] }]);
             setVisibleLines(n => n + 1);
         }
-    }
-
-    function OutputTable({data, visibleLines}) {
-        const rows = data.slice(0, visibleLines);
-
-        return (
-            <table className="output-table">
-                <thead>
-                <tr>
-                    <th>Tokens</th>
-                    <th>Stack</th>
-                </tr>
-                </thead>
-                <tbody>
-                {rows.map((row, index) => {
-                    const isError = row.tokens.includes("ERROR");
-
-                    return (
-                        <tr key={index}>
-                            <td>
-                            <pre>
-                                {row.tokens.join(" ")}
-                            </pre>
-                            </td>
-                            <td>
-                            <pre>
-                                {isError
-                                    ? row.stack.join("\n")
-                                    : row.stack.map((v) => `[s${index}] ${v}`).join("\n")}
-                            </pre>
-                            </td>
-                        </tr>
-                    )
-                })}
-                </tbody>
-            </table>
-        );
     }
 
     useEffect(() => {
@@ -307,17 +184,14 @@ function App() {
         <div className="App">
             <div className="body">
                 <h1>KKJ validator</h1>
+
                 <div className="input-section">
-                    <select
-                        onChange={handleExampleChange}
-                        value={program}
-                    >
-                        {examples.map((ex, index) => (
-                            <option key={index} value={ex.value}>
-                                {ex.label}
-                            </option>
-                        ))}
-                    </select>
+                    <ExampleSelector
+                        program={program}
+                        setProgram={setProgram}
+                        examples={examples}
+                    />
+
                     <div className="textarea-wrapper">
                         <textarea
                             id="user-input"
@@ -333,56 +207,22 @@ function App() {
                             ?
                         </div>
 
-                        {showHelp && (
-                            <div className="help-popup">
-                                <strong>KKJ Commands</strong>
-
-                                <ul>
-                                    <li><b>ADD</b> – add top two numbers</li>
-                                    <li><b>SUB</b> – subtract second from top</li>
-                                    <li><b>MUL</b> – multiply top two numbers</li>
-                                    <li><b>CMP</b> – compare top two numbers</li>
-
-                                    <li><b>NOT</b> – </li>
-                                    <li><b>AND</b> – </li>
-                                    <li><b>ISNEG</b> – check if value is negative</li>
-                                    <li><b>ISPOS</b> – check if value is positive</li>
-
-                                    <li><b>CLEAR</b> – clear stack</li>
-                                    <li><b>OVER</b> – duplicate second top value to the top</li>
-                                    <li><b>POP</b> – remove top value</li>
-                                    <li><b>DUP</b> – duplicate top of stack</li>
-                                    <li><b>SWAP</b> – swap top two values</li>
-                                    <li><b>ROTL</b> – move third top value to the top</li>
-                                    <li><b>ID</b> – identity (used when rewrite while to the condition)</li>
-
-                                    <li><b>{`{ ... }`}</b> – quotation (block of code) push it to the top</li>
-                                    <li><b>APPLY</b> – execute quotation saved on the top position</li>
-                                    <li><b>APPLYOVER</b> – execute quotation saved on the second top position</li>
-                                    <li><b>COMPOSE</b> – combine two quotations</li>
-
-                                    <li><b>CHOOSE</b> – choose between two values</li>
-
-                                    <li><b>WHILE</b> – loop (condition + body)</li>
-                                </ul>
-
-                                <hr />
-
-                                <p><b>Example:</b></p>
-                                <code>3 4 add → 7</code>
-                            </div>
-                        )}
+                        {showHelp && <HelpPopup />}
                     </div>
+
                     <div className="input-buttons">
                         <button onClick={validateProgram}>Run</button>
                         <button onClick={saveToFile}>Save program to file</button>
-                        <button onClick={() => fileInputRef.current.click()}>Load program from file</button>
+                        <button onClick={() => fileInputRef.current.click()}>
+                            Load program from file
+                        </button>
                     </div>
+
                     <input
                         type="file"
                         accept=".txt"
                         ref={fileInputRef}
-                        style={{display: "none"}}
+                        style={{ display: "none" }}
                         onChange={loadFromFile}
                     />
                 </div>
@@ -397,18 +237,20 @@ function App() {
                             />
                         </div>
                     </div>
+
                     <div className="output-buttons">
                         <div className="top-buttons">
                             <button
                                 onClick={() =>
-                                    setVisibleLines((n) => Math.max(1, n - 1))
+                                    setVisibleLines(n => Math.max(1, n - 1))
                                 }
                             >
                                 Previous
                             </button>
+
                             <button
                                 onClick={() =>
-                                    setVisibleLines((n) => {
+                                    setVisibleLines(n => {
                                         const newValue = Math.min(output.length, n + 1);
 
                                         if (newValue === output.length) {
@@ -422,6 +264,7 @@ function App() {
                                 Next
                             </button>
                         </div>
+
                         <div className="bottom-button">
                             <button
                                 onClick={() => {
@@ -432,7 +275,10 @@ function App() {
                             >
                                 Show all states
                             </button>
-                            <button onClick={exportTableToFile}>Export table with states</button>
+
+                            <button onClick={exportTableToFile}>
+                                Export table with states
+                            </button>
                         </div>
                     </div>
                 </div>

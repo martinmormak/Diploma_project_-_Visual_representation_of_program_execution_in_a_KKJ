@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     background-color: white;
 }
@@ -30,7 +34,7 @@ textarea {
     margin-bottom: 2vh;
     flex: 1;
     height: 20vh;
-    width: 89vw;
+    width: 95vw;
     font-family: monospace;
     font-size: 1.4em;
     padding: 2vh 2vw;
@@ -39,7 +43,7 @@ textarea {
 
 .textarea-wrapper {
     position: relative;
-    width: 89vw;
+    width: 93vw;
 }
 
 .textarea-wrapper textarea {
@@ -49,7 +53,7 @@ textarea {
 .help-icon {
     position: absolute;
     top: 0.5rem;
-    right: 0;
+    right: 0.5rem;
     width: 2vw;
     height: 2vw;
     background: #555;
@@ -65,7 +69,7 @@ textarea {
 .help-popup {
     position: absolute;
     top: 0.5rem;
-    right: 1rem;
+    right: 1.5rem;
     width: 22vw;
     background: #1e1e1e;
     color: #d4d4d4;
