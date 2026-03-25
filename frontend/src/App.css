@@ -33,7 +33,7 @@ select {
 textarea {
     margin-bottom: 2vh;
     flex: 1;
-    height: 20vh;
+    height: 27vh;
     width: 95vw;
     font-family: monospace;
     font-size: 1.4em;
@@ -54,8 +54,8 @@ textarea {
     position: absolute;
     top: 0.5rem;
     right: 0.5rem;
-    width: 2vw;
-    height: 2vw;
+    width: 1.5rem;
+    height: 1.5rem;
     background: #555;
     color: white;
     border-radius: 50%;
@@ -70,7 +70,7 @@ textarea {
     position: absolute;
     top: 0.5rem;
     right: 1.5rem;
-    width: 22vw;
+    width: 75vw;
     background: #1e1e1e;
     color: #d4d4d4;
     border: 1px solid #444;
@@ -112,7 +112,7 @@ button {
     padding: 2vh 2vw;
     background: #1e1e1e;
     width: 89vw;
-    height: 25vh;
+    height: 35vh;
     display: flex;
     flex-direction: column;
 }
@@ -238,7 +238,7 @@ pre {
     }
 
     .output-screen {
-        height: 38vh;
+        height: 42vh;
         margin-bottom: 0;
     }
 
@@ -266,5 +266,14 @@ pre {
         width: 10vw;
         padding: 1.5vh 1.5vw;
         font-size: 1em;
+    }
+
+    .help-icon {
+        width: 2vw;
+        height: 2vw;
+    }
+
+    .help-popup {
+        width: 22vw;
     }
 }
