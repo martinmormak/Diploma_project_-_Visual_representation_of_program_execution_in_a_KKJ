@@ -42,7 +42,7 @@ public final class Sequence_sequence
       }
       case Sequence.Cons(var c) ->
       {
-        var _1 = Constant_constatant.operation(c);
+        var _1 = Constant_constant.operation(c);
         return (_Operation)(var te) -> 
         {
           _1.apply(te);

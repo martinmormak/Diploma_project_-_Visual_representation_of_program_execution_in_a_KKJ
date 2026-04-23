@@ -192,7 +192,7 @@ language KKJ
     }
     inference te ⊢ Cons[c]: sequence
     {
-      te ⊢ c: constatant;
+      te ⊢ c: constant;
     }
     inference te ⊢ ArithmeticOp[a]: sequence
     {
@@ -215,18 +215,18 @@ language KKJ
       te ⊢ o: ooperation;
     }
   }
-  judgment #List<IToken># ⊢ Constant: constatant
+  judgment #List<IToken># ⊢ Constant: constant
   {
-    inference te ⊢ PosNum[n]: constatant
+    inference te ⊢ PosNum[n]: constant
     {
     }
-    inference te ⊢ NegNum[n]: constatant
+    inference te ⊢ NegNum[n]: constant
     {
     }
-    inference te ⊢ True: constatant
+    inference te ⊢ True: constant
     {
     }
-    inference te ⊢ False: constatant
+    inference te ⊢ False: constant
     {
     }
   }

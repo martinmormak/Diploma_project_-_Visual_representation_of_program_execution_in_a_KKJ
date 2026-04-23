@@ -5,6 +5,7 @@ import org.core.Tokenizer;
 import org.core.tokens.interfaces.IToken;
 import org.server.JSON.RequestJSONRepresentation;
 import org.server.JSON.ResponseJSONRepresentation;
+import org.server.services.AppStateService;
 import org.slang.KKJException;
 import org.slang.lang.kkj.*;
 import org.springframework.http.HttpStatus;
@@ -20,8 +21,18 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1")
 public class KKJController {
 
+    private final AppStateService appStateService;
+
+    public KKJController(AppStateService appStateService) {
+        this.appStateService = appStateService;
+    }
+
     @PostMapping("/validate")
     public ResponseEntity<String> validateInput(@RequestBody RequestJSONRepresentation request) {
+        if (!appStateService.isActive()) {
+            return new ResponseEntity<>("Application is inactive", HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
         System.out.println("---------- validateInput ----------");
         if (request.getTokensValue() == null || request.getTokensValue().isEmpty()) {
             return new ResponseEntity<>("Tokens input is empty", HttpStatus.BAD_REQUEST);
@@ -59,6 +70,10 @@ public class KKJController {
 
     @PostMapping("/simulate/from-scratch")
     public ResponseEntity<String> getSimulationFromScratch(@RequestBody RequestJSONRepresentation request) {
+        if (!appStateService.isActive()) {
+            return new ResponseEntity<>("Application is inactive", HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
         System.out.println("---------- getSimulationFromScratch ----------");
         if (request.getTokensValue() == null || request.getTokensValue().isEmpty()) {
             return new ResponseEntity<>("Tokens input is empty", HttpStatus.BAD_REQUEST);
@@ -103,6 +118,10 @@ public class KKJController {
 
     @PostMapping("/simulate/from-point")
     public ResponseEntity<String> getSimulationFromPoint(@RequestBody RequestJSONRepresentation request) {
+        if (!appStateService.isActive()) {
+            return new ResponseEntity<>("Application is inactive", HttpStatus.SERVICE_UNAVAILABLE);
+        }
+        
         System.out.println("---------- getSimulationFromPoint ----------");
         if (request.getTokensValue() == null || request.getTokensValue().isEmpty() || request.getStackValue() == null || request.getStackValue().isEmpty()) {
             return new ResponseEntity<>("Tokens input or Stack input is empty", HttpStatus.BAD_REQUEST);

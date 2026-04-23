@@ -199,47 +199,47 @@ language KKJ
     record BoolValue(Boolean value) implements Value
     { @Override public Boolean getValue() { return value; } @Override public String toString() { return String.valueOf(value); } }
   #}
-  judgment #Env# ⊢ NumberConstant: nconstatant
+  judgment #Env# ⊢ NumberConstant: nconstant
   {
-    inference te ⊢ Num[n]: nconstatant
+    inference te ⊢ Num[n]: nconstant
     {
     }
   }
-  judgment #Env# ⊢ BooleanConstant: bconstatant
+  judgment #Env# ⊢ BooleanConstant: bconstant
   {
-    inference te ⊢ True: bconstatant
+    inference te ⊢ True: bconstant
     {
     }
-    inference te ⊢ False: bconstatant
+    inference te ⊢ False: bconstant
     {
     }
   }
-  judgment #Env# ⊢ Constant: constatant
+  judgment #Env# ⊢ Constant: constant
   {
-    inference te ⊢ NumConstant[n]: constatant
+    inference te ⊢ NumConstant[n]: constant
     {
-      te ⊢ n: nconstatant;
+      te ⊢ n: nconstant;
     }
-    inference te ⊢ BoolConstant[b]: constatant
+    inference te ⊢ BoolConstant[b]: constant
     {
-      te ⊢ b: bconstatant;
+      te ⊢ b: bconstant;
     }
-    inference te ⊢ NumPopInside[n,c]: constatant
+    inference te ⊢ NumPopInside[n,c]: constant
     {
-      te ⊢ n: nconstatant;
-      te ⊢ c: constatant;
+      te ⊢ n: nconstant;
+      te ⊢ c: constant;
     }
-    inference te ⊢ BoolPopInside[b,c]: constatant
+    inference te ⊢ BoolPopInside[b,c]: constant
     {
-      te ⊢ b: bconstatant;
-      te ⊢ c: constatant;
+      te ⊢ b: bconstant;
+      te ⊢ c: constant;
     }
   }
   judgment #Env# ⊢ NumberExpression: nexpression
   {
     inference te ⊢ NumExpression[n]: nexpression
     {
-      te ⊢ n: nconstatant;
+      te ⊢ n: nconstant;
     }
     inference te ⊢ Add[e1,e2]: nexpression
     {
@@ -264,21 +264,21 @@ language KKJ
     inference te ⊢ NumberPopBefore[e,c]: nexpression
     {
       te ⊢ e: nexpression;
-      te ⊢ c: constatant;
+      te ⊢ c: constant;
     }
     inference te ⊢ NumberPopAfter[c,e]: nexpression
     {
-      te ⊢ c: constatant;
+      te ⊢ c: constant;
       te ⊢ e: nexpression;
     }
     inference te ⊢ NumberPopInside1[c,e]: nexpression
     {
-      te ⊢ c: constatant;
+      te ⊢ c: constant;
       te ⊢ e: nexpression;
     }
     inference te ⊢ NumberPopInside2[c,e]: nexpression
     {
-      te ⊢ c: constatant;
+      te ⊢ c: constant;
       te ⊢ e: nexpression;
     }
   }
@@ -286,7 +286,7 @@ language KKJ
   {
     inference te ⊢ BoolExpression[bc]: bexpression
     {
-      te ⊢ bc: bconstatant;
+      te ⊢ bc: bconstant;
     }
     inference te ⊢ Not[b]: bexpression
     {
@@ -308,21 +308,21 @@ language KKJ
     inference te ⊢ BooleanPopBefore[b,c]: bexpression
     {
       te ⊢ b: bexpression;
-      te ⊢ c: constatant;
+      te ⊢ c: constant;
     }
     inference te ⊢ BooleanPopAfter[c,b]: bexpression
     {
-      te ⊢ c: constatant;
+      te ⊢ c: constant;
       te ⊢ b: bexpression;
     }
     inference te ⊢ BooleanPopInside1[c,b]: bexpression
     {
-      te ⊢ c: constatant;
+      te ⊢ c: constant;
       te ⊢ b: bexpression;
     }
     inference te ⊢ BooleanPopInside2[c,b]: bexpression
     {
-      te ⊢ c: constatant;
+      te ⊢ c: constant;
       te ⊢ b: bexpression;
     }
   }
@@ -338,7 +338,7 @@ language KKJ
     }
     inference te ⊢ Pop[c]: command
     {
-      te ⊢ c: constatant;
+      te ⊢ c: constant;
     }
   }
   judgment #Env# ⊢ Sequence: sequence
