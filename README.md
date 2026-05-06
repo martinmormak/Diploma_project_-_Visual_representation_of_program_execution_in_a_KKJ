@@ -1,93 +1,184 @@
-# DP code
+# 🎓 Visual Representation of Program Execution in KKJ
 
+This project provides a **visual representation of program execution** for programs written in the **KKJ language**. It is designed as an educational tool that helps users understand how programs are analyzed and executed step by step.
 
+The application is built as a **full-stack system**:
+- **Frontend:** React
+- **Backend:** Java (lexical + syntactic analyzer + execution simulator)
 
-## Getting started
+---
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## 🚀 Features
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+- ✍️ Write and submit a program in KKJ
+- 🔍 Perform lexical and syntactic analysis
+- ❌ Display errors if the program is invalid
+- ▶️ Simulate program execution
+- ⏱️ Step-by-step execution
+- 📊 Visualize program state during execution
 
-## Add your files
+---
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+## 🏗️ Architecture
 
+### 🖥️ Frontend (React)
+- Code editor for KKJ programs
+- Displays errors and execution steps
+- Visualizes program execution
+- Communicates with backend via REST API
+
+### ⚙️ Backend (Java)
+- Lexical analyzer (tokenization)
+- Syntax analyzer (parser)
+- Semantic validation (if implemented)
+- Execution simulator
+- Generates execution steps for visualization
+
+---
+
+## 🔄 Application Workflow
+
+```mermaid
+flowchart TD
+    A[User enters KKJ program] --> B[Send to backend]
+    B --> C[Lexical analysis]
+    C --> D[Syntax analysis]
+    D --> E{Valid?}
+    E -- No --> F[Return errors]
+    E -- Yes --> G[Simulate execution]
+    G --> H[Generate steps]
+    H --> I[Frontend visualization]
 ```
-cd existing_repo
-git remote add origin https://git.kpi.fei.tuke.sk/kpi-zp/2026/dp.martin.mormak/dp-code.git
-git branch -M main
-git push -uf origin main
+
+---
+
+## 🧪 Example Usage
+
+### Example KKJ Program
+
+```txt
+var x = 5;
+var y = 10;
+x = x + y;
 ```
 
-## Integrate with your tools
+---
 
-- [ ] [Set up project integrations](https://git.kpi.fei.tuke.sk/kpi-zp/2026/dp.martin.mormak/dp-code/-/settings/integrations)
+### Example API Request
 
-## Collaborate with your team
+```bash
+curl -X POST http://localhost:8080/api/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+    "code": "var x = 5; var y = 10; x = x + y;"
+  }'
+```
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+---
 
-## Test and Deploy
+### Example API Response (Valid Program)
 
-Use the built-in continuous integration in GitLab.
+```json
+{
+  "valid": true,
+  "steps": [
+    { "step": 1, "variables": { "x": 5 } },
+    { "step": 2, "variables": { "x": 5, "y": 10 } },
+    { "step": 3, "variables": { "x": 15, "y": 10 } }
+  ]
+}
+```
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+---
 
-***
+### Example API Response (Error)
 
-# Editing this README
+```json
+{
+  "valid": false,
+  "errors": [
+    {
+      "line": 1,
+      "message": "Unexpected token"
+    }
+  ]
+}
+```
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+---
 
-## Suggestions for a good README
+## 🛠️ Technologies
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+### Frontend
+- React
+- JavaScript / TypeScript
+- HTML / CSS
 
-## Name
-Choose a self-explaining name for your project.
+### Backend
+- Java
+- Compiler design principles
+- Custom lexical and syntax analyzer
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+---
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+## ▶️ Getting Started
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+### 1. Clone the repository
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+```bash
+git clone https://github.com/martinmormak/Diploma_project_-_Visual_representation_of_program_execution_in_a_KKJ.git
+cd Diploma_project_-_Visual_representation_of_program_execution_in_a_KKJ
+```
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+---
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+### 2. Run Backend
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+```bash
+cd backend
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+# If using Maven:
+mvn clean install
+mvn spring-boot:run
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+# OR Gradle:
+./gradlew build
+./gradlew bootRun
+```
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+---
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+### 3. Run Frontend
 
-## License
-For open source projects, say how it is licensed.
+```bash
+cd frontend
+npm install
+npm start
+```
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+---
+
+## 🎯 Project Goal
+
+The goal of this project is to:
+- Help students understand how programs are executed internally
+- Visualize key concepts such as:
+  - Variable state
+  - Execution flow
+  - Stack (if implemented)
+
+---
+
+## 🔮 Future Improvements
+
+- Support for more programming constructs
+- Advanced visualization (stack frames, memory model)
+- Interactive debugging
+- Export execution trace
+- Multi-language support
+
+---
+
+## 👨‍💻 Author
+
+**Martin Mormák**
